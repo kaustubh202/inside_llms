@@ -1,0 +1,22 @@
+root: README.md
+
+structure:
+  readme: README.md
+  summary:
+    - Introduction: intro.md
+    - Project Overview:
+        - Objectives: overview/objectives.md
+        - Team Members: overview/team.md
+    - Methodology:
+        - Model Architecture: methodology/model_architecture.md
+        - Training Setup: methodology/training_setup.md
+    - Experiments:
+        - Experiment 1: experiments/exp1.md
+        - Experiment 2: experiments/exp2.md
+        - Template for New Experiments: experiments/exp_template.md
+    - Results:
+        - Metrics: results/metrics.md
+        - Visualizations: results/visualizations.md
+        - Discussion: results/discussion.md
+    - Future Work: future.md
+    - References: references.md
