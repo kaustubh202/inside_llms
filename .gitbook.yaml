@@ -1,18 +1,5 @@
-root: README.md
+root: ./
 
 structure:
   readme: README.md
-  summary:
-    - intro.md
-    - overview/objectives.md
-    - overview/team.md
-    - methodology/model_architecture.md
-    - methodology/training_setup.md
-    - experiments/exp1.md
-    - experiments/exp2.md
-    - experiments/exp_template.md
-    - results/metrics.md
-    - results/visualizations.md
-    - results/discussion.md
-    - future.md
-    - references.md
+  summary: SUMMARY.md
