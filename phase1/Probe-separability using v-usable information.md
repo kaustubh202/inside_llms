@@ -21,9 +21,7 @@ Note that citing from https://arxiv.org/abs/2402.16061 it is One thing is we can
 - 
 ### V-Usable Information
 **V-usable information** (in bits) measures the information content of features for a classification task.
-V-usable information quantifies how much an input $ R_w^{(i)} $ helps a model family $ V $ predict an output $ Y $, measured in bits. It shows the reduction in uncertainty about ( Y ) when using the input.
-The formula is: $$ I_V(R_w^{(i)} \to Y) = H_V(Y) - H_V(Y | R_w^{(i)}) $$
-
+V-usable information quantifies how much an input helps a model family  predict an output measured in bits. It shows the reduction in uncertainty about  Y  when using the input.
 In Simple Terms: V-usable information is how much easier it is to predict ( Y ) (e.g., dataset labels) with the input (e.g., LLaMA-3.2-3B layer features). Higher bits mean better separability. In your experiments, a logistic regression probe estimates this by testing how well MLP, attention, or residual features distinguish CNN, IMDb, and Yelp datasets.
 
 
