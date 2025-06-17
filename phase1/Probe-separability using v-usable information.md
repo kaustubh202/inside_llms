@@ -409,4 +409,4 @@ The three experiments differ in three areas: (1) the activation hook in `Activat
 
 ## 4: Results Summary
 
-[To be filled by the user]
+
