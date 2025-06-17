@@ -3,7 +3,7 @@
 This Readme contains three experiments to evaluate the **separability** of different domains** of the **LLaMA-3.2-3B model** using **v-usable information** . Each experiment probes a specific component of the model’s transformer layers: **Multi-Layer Perceptrons (MLPs)**, **self-attention outputs**, or **residual stream outputs**, to assess their ability to distinguish between three datasets: **CNN Daily Mail**, **IMDb**, and **Yelp Reviews**. Achieveing a high v-usable information in some of the layers can be supportive of surgical domain extraction.
 ## 1: Objective of the Experiment
 
-The objective of these experiments is to measure how well features extracted from different components of the LLaMA-3.2-3B model’s transformer layers—**MLP**, **attention**, and **residual stream**—can separate samples from three distinct datasets (CNN Daily Mail, IMDb, and Yelp Reviews) using **v-usable information**. **V-usable information**, expressed in bits, quantifies the amount of information a feature provides for distinguishing between classes (here, the three datasets)) in a **logistic regression probe**. By probing each component separately, we aim to understand their individual contributions to dataset-specific representations and identify which layers encode the most domain-specific information. This insight can inform model interpretability, feature engineering for NLP tasks, and optimization of transformer architectures.
+The objective of these experiments is to measure how well features extracted from different components of the LLaMA-3.2-3B model’s transformer layers—**MLP**, **attention**, and **residual stream**—can separate samples from three distinct datasets (CNN Daily Mail, IMDb, and Yelp Reviews) using **v-usable information**. **V-usable information**, expressed in bits, quantifies the amount of information a feature provides for distinguishing between classes (here, the three datasets)) in a **logistic regression probe**. By probing each component separately (i.e. MLP layers,Attention layers,Residual Stream activations), we aim to understand their individual contributions to dataset-specific representations and identify which layers encode the most domain-specific information. This insight can help in surgical domain extraction task by informing us of the separability between domains present.
 Note that citing from https://arxiv.org/abs/2402.16061 it is One thing is we can’t directly judge based on accuracy hence we also used V-usable information. V-usable information reflects the ease with which a model family V can predict the output Y given specific input R effectively 
 
 **Probe separability** refers to the ability of a linear probe (logistic regression) trained on extracted features to classify samples by their dataset of origin. A higher v-usable-usable bit score indicates better separability, meaning the features contain more information relevant to distinguishing the datasets. The three experiments isolate:
@@ -54,8 +54,7 @@ In Simple Terms: V-usable information is how much easier it is to predict ( Y ) 
 
 ## 3: Implementation
 
-The three experiments share a common codebase, with differences only in the type of activations probed (MLP, attention, or residual stream). Below, we describe the **common components** subsection by subsection, followed by the **differing components** for each experiment. Each subsection includes a code block and explanation, with differences presented side-by-side for clarity.
-
+The three experiments share a common codebase, with differences only in the type of activations probed (MLP, attention, or residual stream).
 ### Common Components
 
 #### Imports and Setup
