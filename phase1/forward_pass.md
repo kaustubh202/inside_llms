@@ -23,5 +23,12 @@ We pass the input texts through the model and, at each layer, compute the change
 We compute the following statistics from the data:
 - Absolute mean of change matrix over each dataset: 
 - mean of change matrix over each dataset
-- variance of absolute mean of change matrix over each dataset
-- variance of mean of change matrix over each dataset 
+- standard deviation of absolute mean of change matrix over each dataset
+- standard deviation of mean of change matrix over each dataset 
+
+### Visualizing the statistics: 
+![Comparison of Mean with Std](forward_pass_mean_std.png)
+![Comparison of Abs Mean with Abs Std](forward_pass_abs_mean_abs_std.png)
+![Comparison of Abs Mean with Std](foward_pass_abs_mean_std.png)
+We also compare the variance in layers for different datasets. 
+![alt text](forward_pass_layer_variance.png)
