@@ -1,16 +1,17 @@
-# Summary
+# Table of contents
 
-* Introduction
-  * [Overview](Introduction/overview.md)
+* [inside\_llms](README.md)
+* [Introduction](introduction/README.md)
   * [Objectives](Introduction/objectives.md)
-* Phase 1 Experiments
+  * [Overview](Introduction/overview.md)
+* [Phase 1](phase1/README.md)
   * [Forward Pass Profiling](phase1/forward_pass.md)
   * [Fine Tuning](phase1/fine_tune.md)
-* Phase 2 Experiments
-  * [Experiment1](Phase2/experiment1.md)
-  * [Experiment2](Phase2/experiment2.md)
+* [Phase 2](phase-2/README.md)
+  * [Experiment 1](phase-2/experiment-1.md)
 * [Conclusion](conclusion.md)
-* Appendix
-  * [Team Members](appendix/team_members.md)
+* [Appendix](appendix/README.md)
   * [Future Work](appendix/future.md)
   * [References](appendix/references.md)
+  * [Team Members](appendix/team_members.md)
+* [Summary](summary.md)
