@@ -15,3 +15,5 @@ For each trainable LoRA adapter matrix, the following metrics were computed from
 To create a clear, high-level overview, these individual matrix-level statistics were aggregated by their parent transformer layer number. This provides a macroscopic view of how learning was distributed across the model's depth.
 
 # Results
+![](cpp_mean.png)
+
