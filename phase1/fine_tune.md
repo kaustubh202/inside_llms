@@ -15,5 +15,28 @@ For each trainable LoRA adapter matrix, the following metrics were computed from
 To create a clear, high-level overview, these individual matrix-level statistics were aggregated by their parent transformer layer number. This provides a macroscopic view of how learning was distributed across the model's depth.
 
 # Results
+## Comparitve weight changes across domains
+![](all_mean_change.png)
+![](all_abs_mean_change.png)
+
+## Weight change across layers in individual domains
+
 ![](cpp_mean.png)
 
+![](cpp_abs_mean.png)
+
+![](python_mean.png)
+
+![](python_abs_mean.png)
+
+![](physics_mean.png)
+
+![](physics_abs_mean.png)
+
+![](math_sol_mean.png)
+
+![](math_sol_abs_mean.png)
+
+![](math_think_mean.png)
+
+![](math_think_abs_mean.png)
