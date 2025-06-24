@@ -4,16 +4,16 @@ icon: hand-wave
 
 # inside\_llms
 
-
-Understanding a large language model often feels like staring at a city skyline at night—plenty of lights, not much sense of who’s inside which room.  
-We’re a small group of undergraduate researchers who wanted to map specific “rooms” inside one model—layers that lean toward Python, others that prefer physics, and so on—without enterprise-grade GPUs.
+Large Language Models are the talk of the town, and as they're gaining more grounds, it's become increasingly difficult and important to understand what's going inside them.
+Understanding a large language model often feels like staring at a city skyline at night, there are plenty of lights, but not much sense of who’s inside which room.  
+We’re a small group of undergraduate researchers who wanted to map specific “rooms” inside one model—layers that lean toward Python, others that prefer physics, and so on—without enterprise-grade GPUs. Basically, trying to figure out where exactly domain-specific knowledge is stored in an LLM.
 
 Our approach so far
 
-* **Model in scope** – *Llama 3.2-3B* (27 transformer layers), chosen because it fits on free Kaggle GPUs. (We have limited resources as "unsupervised" undergrads)
-* **Domain sets** – short corpora for C++, Python, mathematics (questions + solutions), and physics explanations.  
-* **Experiments** – forward-pass profiling, lightweight fine-tunes, logistic probes, zero-out tests, and a few interpretability touches. Each experiment lives in its own page in the sidebar.  
-* **Early pattern** – mid-stack layers (around 10–15) show the most separability; some heads are versatile across programming languages, others are surprisingly single-minded.
+* **Model in scope**: *Llama 3.2-3B* (27 transformer layers), chosen because it fits on free Kaggle GPUs. (We have limited resources as "unsupervised" undergrads)
+* **Domain sets**: short corpora for C++, Python, mathematics (questions + solutions), and physics explanations.  
+* **Experiments**: forward-pass profiling, lightweight fine-tunes, logistic probes, zero-out tests, and a few interpretability touches. Each experiment lives in its own page in the sidebar.  
+* **Early pattern**- mid-stack layers (around 10–15) show the most separability; some heads are versatile across programming languages, others are surprisingly single-minded.
 
 What you’ll find on this site
 
