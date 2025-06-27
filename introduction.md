@@ -35,19 +35,25 @@ If those components can be isolated, we can:
 ---
 
 ## Formal statement
+Let `M` be the original 27-layer model.  
+Let `d` be a domain from our set.  
+Let `S_d` be the subset of layers retained for domain `d`.  
+Let `Perf(M, d)` be a domain metric (perplexity or task score).  
 
-Let $M$ be the original 27-layer model.  
-Let $d$ be a domain from our set.  
-Let $S_d$ be the subset of layers retained for domain $d$.
-Let $\text{Perf}(M,d)$ be a domain metric (perplexity or task score).  
-
-The goal is to find the smallest $S_d$ such that:
+The goal is to find the smallest `S_d` such that:
 
 $$
 \text{Perf}(M_{S_d}, d) \ge (1 - \varepsilon)\, \text{Perf}(M, d),
 $$
 
-with $\varepsilon$ set to 0.05 (i.e., ≤ 5% degradation).  
+with
+
+$$
+\varepsilon = 0.05 \quad 
+$$
+
+i.e. < 5% degradation.
+
 Layer relevance is estimated through **probe separability**, **zero-out tests**, and **finetune-delta measurements**; details appear in the experiment pages.
 
 ---
