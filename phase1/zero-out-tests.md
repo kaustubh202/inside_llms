@@ -273,6 +273,7 @@ We just plot average weight per layer across domains which can imply what layers
 
 ### 5.2 Similarity between components
 Since we had 5 domain datasets , we have 5 linear regressors corresponding to each of the domain datasets , each of whose weights ,  in simple terms , represent the importance of those components who were responsible for predicting the output of that particular domain. So according to that if weights of a linear regressor trained on python codes dataset much show more similarity with dataset of C++ codes than physics , keeping this mind we plot the similarity between trained weights for all the datasets we have trained upon:
+
 ![Correlation between regressor weights per domain](zero_out_similarity_between_domains.png)
 
 You must be thinking then why is there a good similarity between maths_think and python? We hypothesize that the most important layers which we got from maths_think dataset represent the logical reasoning ability of the model and therefore all our datasets being reasoning related we are getting a good similarity between them , whereas maths_solution dataset is more oriented towards writing the solution and hence very low logical reasoning required therefore giving a low similarity with python.
