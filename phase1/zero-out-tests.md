@@ -32,7 +32,7 @@ $$
 S = \{ z_i = (x_i, y_i) \}_{i=1}^n
 $$
 
-Let $M$ be a trained model (whose internal working we want to know) and \( f_M(z) \in \mathbb{R} \) be a statistic measuring correctness on example \text{z} — such as:
+Let $M$ be a trained model (whose internal working we want to know) and \( f_M(z) \in \mathbb{R} \) be a statistic measuring correctness on example \text{z} — such as test:
 
 - Cross-entropy loss (for classification task)
 - Mean Squared error (for regression task)
