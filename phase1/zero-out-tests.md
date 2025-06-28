@@ -197,6 +197,8 @@ $$
 $$
 
 We got a whooping 98 percent correlation between our predicted margins and the predicted margins , indicating the reliability of the analysis.
+
+
 ![Correlation graph between predicted and true outputs](zero_out_correlation_graph.png)
 
 
