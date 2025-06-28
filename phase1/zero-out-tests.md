@@ -8,7 +8,7 @@ Traditional attribution methods often focus on inputs (like saliency maps for pi
 
 In the last test (*The Hydra Effect*), we zeroed out outputs and measured the difference in logits. COAR goes one step further by training a **linear regressor** which assigns weights to components, indicating their contribution to the change in output. This enables deeper analysis of specific components’ roles in prediction.
 
-This method is called **COAR**  *Component Optimization via Ablation and Reconstruction*.
+This method is called **COAR**  *Component Attribution via Regression*.
 
 
 
@@ -75,7 +75,7 @@ Or if we want to do a finer analysis then we can define components as the rows o
 
 In our study we wanted to study about the layers of LLMs that how ablating a layer would affect the output or if framed in better words it can be said as which layer would consist of the knowledge about a particular domain is what we want to find.
 
-Therefore we defined our components as each weight matrix(total number of components came out to be 196 for Llama 3.2 3B model) in all the layers which roughly but in a more sofisticated manner divided our model into layer componenets.
+Therefore we defined our components as each weight matrix(total number of components came out to be 196 for Llama 3.2 3B model in all the layers which roughly but in a more sofisticated manner divided our model into layer componenets.
 
 
 
