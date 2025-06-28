@@ -42,13 +42,13 @@ Let $M$ be a trained model (whose internal working we want to know) and $$f_M(z)
 
 Now in our case , we want to analyze LLama 3.2 3B model , a generative model, then how do we define a statistic for measuring the correctness of an example?
 
-We do **next-token prediction** in LLama 3.2 3B model, framed as a $v$-way classification problem, where $v$ is the vocabulary size and therefore the model output function is defined as the **average correct-class margin** over a sequence:
+We do **next-token prediction** in LLama 3.2 3B model, framed as a $$v$$-way classification problem, where $v$ is the vocabulary size and therefore the model output function is defined as the **average correct-class margin** over a sequence:
 
 $$
 f_M(z) = \frac{1}{T} \sum_{t=1}^T \left( \text{logit}_{\text{true}_t} - \max_{j \neq \text{true}_t} \text{logit}_j \right)
 $$
 
-Where $T$ is the number of tokens in the sequence.
+Where $$T$$ is the number of tokens in the sequence.
 
 
 
@@ -56,14 +56,14 @@ Where $T$ is the number of tokens in the sequence.
 
 
 ### 2.2 Modeling Internals with a Computation Graph
-Once we have a dataset for our model to be trained on we define componenets which determine with what granualarity we have to ablate the models , in simple words it's just the parts of the model $M& in which we are interested 
+Once we have a dataset for our model to be trained on we define componenets which determine with what granualarity we have to ablate the models , in simple words it's just the parts of the model $$M$$ in which we are interested 
 > "What would ablating this particular part of the model change the output , such set of parts is components. "
 
-We do not treat $M$ as a black box, but as a **computation graph** $G_M$, with nodes representing internal **components** and the definition of components is in our hands that is :
+We do not treat $$M$$ as a black box, but as a **computation graph** $$G_M$$, with nodes representing internal **components** and the definition of components is in our hands that is :
 
 For a linear model:  
-- Each component $C_i(z) = w_i \cdot x_i$  
-- Output is $\sum_i C_i(z)$
+- Each component $$C_i(z) = w_i \cdot x_i$$  
+- Output is $$\sum_i C_i(z)$$
 
 For complex models like Transformers, components may be:
 - Entire layers or submodules
@@ -87,10 +87,10 @@ We define the **component counterfactual function**:
 $$
 f_M(z, C') := \text{model output on } z \text{ after ablating components } C' \subseteq C \tag{1}
 $$
-That is simply what is the output of the model on an example $ z = (x, y) $ when we **ablate** $ C'$ components out of $C$.
+That is simply what is the output of the model on an example $$ z = (x, y) $$ when we **ablate** $$ C'$$ components out of $$C$$.
 **Ablation** here means setting weights of selected components to zero.
 
-So in our case we randomly set some $\alpha_{\text{train}}$ percent (3 percent in our case) of total components of the weight matrices to 0 and then pass the examples $z$ and record the change in output.
+So in our case we randomly set some $$\alpha_{\text{train}}$$ percent (3 percent in our case) of total components of the weight matrices to 0 and then pass the examples $$z$$ and record the change in output.
 
 
 
@@ -99,7 +99,7 @@ So in our case we randomly set some $\alpha_{\text{train}}$ percent (3 percent i
 
 For answering the above question we defince ablation more formally as:
 
-Let $C = \{c_1, \dots, c_N\}$ be the components. The ablation vector $\mathbf{0}_{C'} \in \{0,1\}^N$ is defined by:
+Let $$C = \{c_1, \dots, c_N\}$$ be the components. The ablation vector $$\mathbf{0}_{C'} \in \{0,1\}^N$$ is defined by:
 
 $$
 (\mathbf{0}_{C'})_i = 
@@ -109,21 +109,21 @@ $$
 \end{cases}
 $$
 
-Which is simply an ablation mask ,  that is if a component is in $C'$ set of components ($C'$ is the set of componenets out of the total components which we want to ablate) then consider that component as 0 , otherwise keep it 1.
+Which is simply an ablation mask ,  that is if a component is in $$C'$$ set of components ($$C'$$ is the set of componenets out of the total components which we want to ablate) then consider that component as 0 , otherwise keep it 1.
 
 
 
 ### 2.5 Component Attribution
-One last definition we have to define is of a simple linear model $g^{(z)}$ that approximates $f_M(z, C')$:
+One last definition we have to define is of a simple linear model $$g^{(z)}$$ that approximates $$f_M(z, C')$$:
 
 $$
 g^{(z)}(\mathbf{0}_{C'}) = \mathbf{0}_{C'}^\top \cdot \mathbf{w}^{(z)} + b^{(z)} \tag{2}
 $$
 
 Here:
-- $\mathbf{w}^{(z)}$ is a learned attribution vector
-- $b^{(z)}$ is a bias term
-- $g^{(z)}$ approximates the counterfactual output
+- $$\mathbf{w}^{(z)}$$ is a learned attribution vector
+- $$b^{(z)}$$ is a bias term
+- $$g^{(z)}$$ approximates the counterfactual output
 
 
 
@@ -137,16 +137,16 @@ In simple terms the dataset for the linear regressor can be defined as
 
 
 Writing the same thing but in the terms that we defined above:
-For a given input $z$ we construct a dataset of component ablations:
+For a given input $$z$$ we construct a dataset of component ablations:
 
 $$
 \mathcal{D}^{(z)} := \left\{ (C_1, f_M(z, C_1)), \dots, (C_m, f_M(z, C_m)) \right\} \tag{3}
 $$
 
-- Each $C_i$ is a random subset of components of size $\alpha_{\text{train}} \cdot |C|$
-- $f_M(z, C_i)$ is the counterfactual output
+- Each $$C_i$$ is a random subset of components of size $$\alpha_{\text{train}} \cdot |C|$$
+- $$f_M(z, C_i)$$ is the counterfactual output
 
-where $\alpha_{\text{train}}$ is the percentage of components ablated.
+where $$\alpha_{\text{train}}$$ is the percentage of components ablated.
 
 In our experiments we had 5 such datasets corresponding to 5 domains , namely C++ , python , mathematics-think , mathematics-reason and physics.
 
@@ -181,7 +181,7 @@ Suppose we there is an LLM on which we trained this regressor after following al
 ## 4 Evaluate Attribution Accuracy
 
 ### 4.1 Correlation between predictions
-Now to confirm if the predictions we are giving or the analysis which we are doing is correct we do a simple correlation text , we use unseen subsets $C'_i$ to evaluate generalization:
+Now to confirm if the predictions we are giving or the analysis which we are doing is correct we do a simple correlation text , we use unseen subsets $$C'_i$$ to evaluate generalization:
 
 $$
 \mathcal{D}_{\text{test}}^{(z)} = \{ C'_1, \dots, C'_k \}, \quad C'_i \sim \text{Uniform}\left(\{ C' \subset C : |C'| = \alpha_{\text{test}}|C| \}\right)
@@ -193,7 +193,6 @@ $$
 \rho^{(z)} := \text{Pearson-}\rho \left(
 \{ f_M(z, C'_i) \}_{i=1}^k,
 \{ g^{(z)}(\mathbf{0}_{C'_i}) \}_{i=1}^k
-\right) \tag{6}
 $$
 
 We got a whooping 98 percent correlation between our predicted margins and the predicted margins , indicating the reliability of the analysis.
@@ -210,16 +209,16 @@ To test the **robustness and reproducibility** of COAR component attributions, w
 
 #### 4.2.1 Experimental Setup
 
-- We randomly split our dataset into **two disjoint parts**, say $\mathcal{D}_1$ and $\mathcal{D}_2$.
+- We randomly split our dataset into **two disjoint parts**, say $$\mathcal{D}_1$$ and $$\mathcal{D}_2$$.
 - For each split:
   - We applied the standard COAR pipeline (random ablations, counterfactual evaluation, linear model fitting).
-  - This gave us two sets of attribution vectors: $\theta^{(z)}_1$ and $\theta^{(z)}_2$.
+  - This gave us two sets of attribution vectors: $$\theta^{(z)}_1$$ and $$\theta^{(z)}_2$$.
 
 
 
 #### 4.2.2 Initial Hypothesis
 
-We **expected** that since the underlying model and ablation process were the same, the component attributions $\theta^{(z)}_1$ and $\theta^{(z)}_2$ would be **highly similar** .
+We **expected** that since the underlying model and ablation process were the same, the component attributions $$\theta^{(z)}_1$$ and $$\theta^{(z)}_2$$ would be **highly similar** .
 
 > In theory, different data samples should yield consistent attributions **if** the signal learned by the linear regressor is strong and components are independently causal.
 
@@ -228,7 +227,7 @@ We **expected** that since the underlying model and ablation process were the sa
 
 But things don't go always as planned , the results **contradicted our expectations**:
 
-- The component weights $\theta^{(z)}_1$ and $\theta^{(z)}_2$ turned out to be **surprisingly different**.
+- The component weights $$\theta^{(z)}_1$$ and $$\theta^{(z)}_2$$ turned out to be **surprisingly different**.
 - This raised an important question:  
   > “Why do two splits of the same dataset, processed using the same method, yield inconsistent attributions?”
 
@@ -237,15 +236,15 @@ Just as we were puzzled.....
 
 On reflection, we realized the issue lay in the **random ablations** used to construct the component datasets:
 
-- Suppose in split 1, the ablation subset was $\{1, 3, 6\}$  
-- And in split 2, it was $\{1, 6, 8\}$
+- Suppose in split 1, the ablation subset was $$\{1, 3, 6\}$$  
+- And in split 2, it was $$\{1, 6, 8\}$$
 
 Even though components 1 and 6 appear in both, the **context of ablation** i.e., the other components they're grouped with changes their influence on the output due to **component interactions**.
 This is because **component effects are not strictly independent**; they interact in non-linear ways within the model's forward pass.
 
 
 Now we then tested a new hypothesis:
-> If we apply the **same set of ablation masks** to both splits (i.e., same $\{C_1, C_2, \dots, C_m\}$ used for dataset construction), then the learned attribution vectors should match.
+> If we apply the **same set of ablation masks** to both splits (i.e., same $$\{C_1, C_2, \dots, C_m\}$$ used for dataset construction), then the learned attribution vectors should match.
 
 And **boom** they did.
 
