@@ -193,6 +193,7 @@ $$
 \rho^{(z)} := \text{Pearson-}\rho \left(
 \{ f_M(z, C'_i) \}_{i=1}^k,
 \{ g^{(z)}(\mathbf{0}_{C'_i}) \}_{i=1}^k
+\right)
 $$
 
 We got a whooping 98 percent correlation between our predicted margins and the predicted margins , indicating the reliability of the analysis.
