@@ -32,7 +32,7 @@ $$
 S = \{ z_i = (x_i, y_i) \}_{i=1}^n
 $$
 
-Let $M$ be a trained model (whose internal working we want to know) and $f_M(z) \in \mathbb{R}$ be a statistic measuring correctness on example $z$ — such as:
+Let $M$ be a trained model (whose internal working we want to know) and $f_M(z) \in \mathbb{R}$ be a statistic measuring correctness on example \{z} — such as:
 
 - Cross-entropy loss (for classification task)
 - Mean Squared error (for regression task)
@@ -258,7 +258,7 @@ For all the datasets we got exact overlapping or almost overlapping graphs
 - When using **identical ablation sets** across both halves of the data, the resulting component attributions were **highly aligned** (quantitatively ).
 - This confirmed that the inconsistency was due to **variability in random ablation masks**, not the data distribution or the model itself.
 - Therefore we can say that the analysis which we are going to do is correct and we are able to extract the the components in which domain knowledge is stored.
-- This also reinforces the importance of considering **component dependencies** when interpreting attribution values — what matters is not just **which component** is ablated, but also **with whom**.
+- This also reinforces the importance of considering **component dependencies** when interpreting attribution values , what matters is not just **which component** is ablated, but also **with whom**.
 
 
 
