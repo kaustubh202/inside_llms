@@ -281,4 +281,6 @@ You must be thinking then why is there a good similarity between maths_think and
 
 ### 5.3 Maths-think v/s Maths-solution
 This is something interesting we stumbled upon , if we plot maths-think regressor weights and maths-solution regressor weights on one graph , we see that for some layers the value of weights was same but for some it was different , we hypothesize that some layers which contributed to mathematical knowledge of the model were same in both the cases but the other layers which came out to be different were more oriented towards logical thinking and solution writing for maths_think and maths_solution respectively.
+
+
 ![Maths_think v/s Maths_solution](zero_out_math_think_vs_reason.png)
