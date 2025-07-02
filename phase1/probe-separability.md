@@ -91,7 +91,7 @@ While standard classification metrics like Accuracy, Precision, Recall, and F1-S
 
 * **V-Usable Bits:** This is a powerful metric from information theory. It tells us how much "information" about the text's domain is actually present and extractable from the activations of a given layer. A higher V-Usable Bits score means the layer's internal representation holds more clear, useful information about the domain.
 * **Fisher Separability Score:** This score measures how "spread out" the different domain clusters are in the activation space. A higher Fisher score indicates that the activations for different domains are far apart and tightly clustered, making them very easy for our linear probe to distinguish.
-    The Fisher Separability Score for two classes, $C_1$ and $C_2$, with means $\mu_1$ and $\mu_2$ and variances $\sigma_1^2$ and $\sigma_2^2$ respectively, is defined as:
+    The Fisher Separability Score for two classes, C_1 and C_2, with means and variances is defined as:
     $$
     F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}
     $$
