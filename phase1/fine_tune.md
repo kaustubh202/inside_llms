@@ -26,7 +26,7 @@ Instead of modifying a huge, pre-trained weight matrix `W` (which has millions o
 ### The Experimental Process
 
 1.  **State Capture**: Before training began, a snapshot of the initial, randomly-initialized LoRA adapter weights (`A` and `B` for all targeted modules) was saved.
-2.  **Training**: The model was fine-tuned for a single epoch on a `40%` fraction of a specialized dataset (e.g., `math_solution.json`). A batch size of 2 and 4 gradient accumulation steps were used, with a learning rate of `1e-3`.
+2.  **Training**: The model was fine-tuned for a single epoch on a specialized dataset (e.g., `math_solution.json`). A batch size of 2 and 4 gradient accumulation steps were used, with a learning rate of `1e-3`.
 3.  **Final State Capture**: After training, the final state of the LoRA adapter weights was captured.
 
 ## Analysis & Metrics
