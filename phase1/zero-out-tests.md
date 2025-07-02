@@ -32,7 +32,7 @@ $$
 S = \{ z_i = (x_i, y_i) \}_{i=1}^n
 $$
 
-Let $M$ be a trained model (whose internal working we want to know) and $$f_M(z) \in \mathbb{R}$$ be a statistic measuring correctness on example $$z$$  such as:
+Let $$M$$ be a trained model (whose internal working we want to know) and $$f_M(z) \in \mathbb{R}$$ be a statistic measuring correctness on example $$z$$  such as:
 
 - Cross-entropy loss (for classification task)
 - Mean Squared error (for regression task)
@@ -42,7 +42,7 @@ Let $M$ be a trained model (whose internal working we want to know) and $$f_M(z)
 
 Now in our case , we want to analyze LLama 3.2 3B model , a generative model, then how do we define a statistic for measuring the correctness of an example?
 
-We do **next-token prediction** in LLama 3.2 3B model, framed as a $$v$$-way classification problem, where $v$ is the vocabulary size and therefore the model output function is defined as the **average correct-class margin** over a sequence:
+We do **next-token prediction** in LLama 3.2 3B model, framed as a $$v$$-way classification problem, where $$v$$ is the vocabulary size and therefore the model output function is defined as the **average correct-class margin** over a sequence:
 
 $$
 f_M(z) = \frac{1}{T} \sum_{t=1}^T \left( \text{logit}_{\text{true}_t} - \max_{j \neq \text{true}_t} \text{logit}_j \right)
