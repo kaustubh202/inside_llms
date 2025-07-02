@@ -1,7 +1,5 @@
 # Visualizing the Locus of Learning: An Analysis of Fine-Tuning Llama 3.2
 
-This experiment investigates the internal changes within a Large Language Model (LLM) during fine-tuning. By tracking parameter modifications, we can pinpoint which parts of the model's architecture are most affected, offering a window into how these complex systems adapt to new information.
-
 ## Objective
 
 The primary goal is to **identify and quantify how a model's parameters adapt when trained on a new, specialized task**. By analyzing the changes in the trainable weights before and after fine-tuning, we aim to visualize which parts of the neural network are most significantly modified. This analysis helps reveal the "locus of learning," indicating whether the model primarily adjusts its foundational, early-layer representations or its abstract, late-layer reasoning capabilities to master a new domain.
@@ -19,9 +17,9 @@ The core of the methodology is a precise, step-by-step process:
     *   `lora_alpha=32`: A scaling factor for the LoRA updates.
     *   `target_modules=["q_proj", "k_proj", "v_proj", "o_proj"]`: The trainable adapters were specifically applied to the query, key, value, and output projection matrices within each self-attention block of the transformer architecture.
 
-### How LoRA Works and Why It's a Valid Proxy for Full Training
+## Why Lora is a Valid Proxy for full training 
 
-**How LoRA Works (In Short):** Instead of modifying a huge, pre-trained weight matrix `W` (which has millions of parameters), LoRA keeps `W` frozen. It learns the *change* to the weights, `ΔW`, by representing this change as the product of two much smaller, "low-rank" matrices, `A` and `B`. During a forward pass, the model's output is calculated as `h = Wx + BAx`. Only `A` and `B` are trained. Because `A` and `B` are tiny compared to `W`, we are training only a fraction of a percent of the total parameters, leading to massive savings in memory and computation time.
+Instead of modifying a huge, pre-trained weight matrix `W` (which has millions of parameters), LoRA keeps `W` frozen. It learns the *change* to the weights, `ΔW`, by representing this change as the product of two much smaller, "low-rank" matrices, `A` and `B`. During a forward pass, the model's output is calculated as `h = Wx + BAx`. Only `A` and `B` are trained. Because `A` and `B` are tiny compared to `W`, we are training only a fraction of a percent of the total parameters, leading to massive savings in memory and computation time.
 
 **Why This Shows Similar Results to Full Training:** This experiment's methodology is grounded in a key research finding known as the **"low-rank hypothesis."** Studies have shown that when large pre-trained models are fully fine-tuned, the matrix representing the change in weights (`ΔW = W_final - W_initial`) tends to have a very low "intrinsic rank." This means the complex update across millions of parameters can be effectively approximated without losing significant information. LoRA is explicitly designed to create such a low-rank update. Therefore, by constraining the update to be low-rank, LoRA is not just an efficiency hack; it's a **principled approximation of the full fine-tuning process.** Analyzing where LoRA applies its largest changes gives us a strong and valid insight into which layers would have been most modified during a full fine-tuning run.
 
