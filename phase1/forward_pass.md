@@ -1,4 +1,5 @@
-## Motivation
+# Layerwise Profiling of LLaMA-3: Measuring How Much Each Transformer Layer Contributes
+
 Large Language Models such as Llama-3 or ChatGPT are black boxes with hundreds of layers where the exact interactions between the layers cannot be understood completely. However, we believe that not all layers are equally responsible for the model's output. By conducting a variety of experiments, we can understand which layers are more active in the contributions to an output. This page explores the technique of Forward Pass Profiling which measures how much each layer changes the internal representation of the input. 
 ## Dataset
 We select our datasets so that they cover a large field of technical domains. The motivation behind this is to check if different domains create sufficient model behaviour shift to be seen in layer contributions over a large set of inputs. 
@@ -62,11 +63,18 @@ def process_texts(texts):
 
 ## Observations
 ![Comparison of Mean with Std](forward_pass_images/forward_pass_mean_std.png)
+
 **Inference**: The mean of all layers is at zero. This is expected since the changes in the change matrix do not proritize a single direction, they can encode contributions in both positive and negative directions. We can see that the deviation is larger which suggests layers contribute equally to both positive and negative changes. 
+
 ![Comparison of Abs Mean with Abs Std](forward_pass_images/forward_pass_abs_mean_abs_std.png)
+
 **Inference**: We can see that the latter layers perform most of the heavy lifting of creating changes in the final output. This aligns with the Transformer theory that latter layers do more semantic computations and are aligned much closer to final logits while initial layers handle low level processing. 
 The deviation of the Abs Mean is consistent across all datasets for the first few layers. In the intermediate and final layers, we observe slight variations for each dataset. However, the differences are too small for us to come to definitive conclusions. 
+
 ![Comparison of Abs Mean with Std](forward_pass_images/foward_pass_abs_mean_std.png) 
+
 **Inference**: Instead of plotting the Abs mean with its own deviation, we visualize the impact of the Mean Std. This reveals how the CPP dataset behaves slightly differently from the other datasets. It shows higher mean from layer 15 to 22. The other datasets follow almost the same trend. 
+
 ![alt text](forward_pass_images/forward_pass_layer_variance.png)
+
 **Inference**: We explicitly plot the varaince data of all layers. These show how the last layer and first layer are much more input sensitive than the intermediate layers. As we can see in the plot. layer 26, 0, 25 generally show maximum variance. In each dataset, the exact ordering of layers is different. 
