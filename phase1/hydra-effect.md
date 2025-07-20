@@ -74,5 +74,146 @@ Intuitively, we would expect that $$\Delta_\text{ablate}$$ and $$\Delta_{\text{u
 ## So how do we use this?
 
 Now that the theoretical background of our experiment is done, let's now discuss what our goal is. We wish to see how ablating different dataset's activations over another dataset's activations causes the model to affect the logit of the predicted token. For this we shall plot the graphs for $$\Delta_\text{ablate}$$ against $$\Delta_{\text{unembed}}$$ for different datasets for a particular layer, or the average of these values for a set of layers that were indiviually ablated. 
+## Overall summary of the process
+
 ## Implementation
+As is common with other experiments, we load the Llama-3.2-3B model in our kaggle notebook. 
+#### Hyperparams and Constants
+```python 
+input_size = 256
+resample_size = 5
+replacement_store_size = 25 
+sample_size = 50 
+```
+**Explanation:** The `input_size` is size of the context window we shall be using. This needs to be fixed so that hooks do not ablate activations with mismatched tensor sizes. `resample_size` is the number of ablation activations will be used per input. the $$\Delta_\text{ablate}$$ for that input will be the average of all the $$\Delta_\text{ablate}$$'s that these resamples produce. We pre-compute the ablating activations for all layers for a particular dataset and store it in a replacement_store dictionary of size `replacement_store_size`. The resampling will be done from this store in a random fashion. `sample_size` is simply the number of inputs will be run per dataset. 
+
+#### Hook Setup 
+Below is the essence of our hook setup. Some details such as error handling and output manipulation (such as in case of attn layer outputs) have been omitted. 
+```python 
+# hook_outputs is a dictionary that stores the outputs for the hooks for each input pass. 
+# layer_mode is set to "capture" as default for each (layer_idx, block_type) tuple 
+def make_hook(block_type, layer_idx):
+    def hook(module, input, output):
+        mode = layer_mode[(layer_idx, block_type)]
+        if mode == 'zero':
+            result = torch.zero_like(out_tensor)
+        elif mode.startswith("replace::"): # eg mode = replace::python
+            dataset_name = mode.split("::")[1]
+            result = random.choice(replacement_store[dataset_name][block_type][layer_idx])
+
+
+        elif mode == 'random':
+            std = replacement_std[block_type][layer_idx].unsqueeze(0)
+            result = torch.randn_like(out_tensor) * std
+        else: # default: capture
+            result = out_tensor
+        
+        hook_outputs[block_type][layer_idx] = result
+        return result
+    return hook
+
+# Attach hooks once globally
+for l in range(len(model.model.layers)):
+    model.model.layers[l].mlp.register_forward_hook(make_hook('mlp', l))
+    model.model.layers[l].self_attn.register_forward_hook(make_hook('attn', l))
+```
+**Explanation:** There are 4 modes a hook can have. Since we cant change the state of the hook once it is attached, we make the hooks refer to a global dictionary `layer_mode` that contains the mode for each forward pass. 
+- **Zero Mode:** Simply ablate the output with a zero tensor of the same shape as the expected output
+- **Replacement Mode:** Replace the activations of the layer with activations from another dataset input. The input is chosen randomly from a list of possible inputs for the selected ablation dataset. For example, suppose we are ablating the MLP of layer 15 with input from dataset "python". The mode will be set to `replace::python`. The location `layer_mode["python"]["mlp"][15]` will be a list of possible activation tensors out of which 1 will be chosen randomly. 
+- **Random Mode:** Replace the output with a random tensor that has the same distribution as the inputs over all datasets. This ensures that the random tensor could be a naturally occuring activation. The replacement_std is a dictionary that contains the standard deviations of all activations per layer. 
+- **Capture Mode:** Store the output in hook_output and continue. This is default behaviour and only records the activations without interfering with the behaviour of the model during forward pass. 
+
+#### Computing the replacement store
+```python 
+def compute_replacement_store(paragraphs, dataset_name, num_layers, max_samples, max_length=input_size)
+    for key in layer_mode:
+        layer_mode[key] = "capture" # Ensure all layers are set to be captured 
+    count = 0
+    for paragraph in paragraphs:
+        if count >= max_samples:
+            break
+        hook_outputs['mlp'].clear()
+        hook_outputs['mlp'].clear()
+
+        inputs = tokenizer(
+            paragraph,
+            return_tensors='pt',
+            truncation=True, 
+            max_length=max_length,
+            padding="max_length"
+        )
+        with torch.no_grad():
+            _ = model(**inputs) # hooks store the outputs 
+        
+        # shift the data from hook_outputs to a list in the replacement store 
+        for block_type in ['mlp', 'attn']:
+            for l in range(num_layers):
+                if l in hook_outputs[block_type]:
+                    tensor = hook_outputs[block_type][l]
+                    replacement_store[dataset_name][block_type][l].append(tensor)
+
+        count += 1
+    return replacement_store
+
+# domain_files is a dictionary of file paths 
+for domain, path in domain_files.items():
+    # load the data in a dictionary as well as update the replacement store for each dataset
+    with open(path, 'r') as file:
+        data = json.load(file)
+        dataset_data[domain] = data
+    replacement_store.update(compute_replacement_store(data[sample_size+1:], domain, num_layers=len(model.model.layers), max_samples=replacement_store_size))
+```
+>**Note:** using `data[sample_size+1:]` instead of directly using `data` in the last line ensures that the replacements leave some samples as normal inputs and use the remaining for computation for ablations. For example, if we are normally passing as inputs the first 25 inputs, the replacement stores has the replacements from the rest of the dataset. This ensures we never mistakenly ablate the input with itself.
+
+#### Delta_unembed implementation
+```python
+def delta_unembed(paragraph, max_length=INPUT_SIZE):
+    # Step 1: Tokenization 
+    inputs = tokenizer(
+        paragraph,
+        return_tensors="pt",
+        truncation=True,
+        max_length=max_length,
+        padding="max_length"
+    ).to(device)
+
+    # Step 2: Forward Pass
+    with torch.no_grad():
+        outputs = model(**inputs, output_hidden_states=True)
+        logits = outputs.logits
+        target_token = torch.argmax(logits[0, -1])
+
+        # Step 3: Storing the Unembedding Mechanism
+        W_U = model.lm_head.weight.detach()
+        z_final = outputs.hidden_states[-1][0, -1]
+        sigma = torch.norm(z_final)
+
+        # Step 4: Logit lensing 
+        delta_mlp = {}
+        delta_attn = {}
+
+        for l in range(len(model.model.layers)):
+            for block_type in ['mlp', 'attn']:
+
+                z_tensor = hook_outputs[block_type][l]
+                rmsnorm_z = (z / torch.norm(z)) * sigma
+                logits_l = rmsnorm_z @ W_U.T
+                logits_l_centered = logits_l - logits_l.mean()
+
+                delta = logits_l_centered[target_token].item()
+
+                if type_ == 'mlp':
+                    delta_mlp[l] = delta
+                else:
+                    delta_attn[l] = delta
+
+    return delta_mlp, delta_attn
+```
+**Explanation:** This function implements the $$\Delta_\text{unembed}$$ for all layers in the model for a single input called `paragraph` here. The following steps are done in this code:
+1. **Tokenization:** The input is tokenized and passed into the model
+2. **Forward Pass:** We pass the input and find the maximum-likelihood token. 
+3. **Unembedding Mechanism**: the unembedding matrix `W_U` is extracted as well as the final hidden states. The RMSNorm uses these values on the final layer to compute the logit probabilities. We shall apply it to each layer output.
+4. **Logit Lensing**: For each layer and block type, we extract its output as `z_tensor`. This is RMSNormed using the unembedding mechanism. THe logits are then centred and the contribution is stored in delta_mlp or delta_attn dictionary which are outputed. 
+ 
+
 
