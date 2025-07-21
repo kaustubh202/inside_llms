@@ -71,10 +71,18 @@ $$
 
 ### Where's the hydra effect?
 Intuitively, we would expect that $$\Delta_\text{ablate}$$ and $$\Delta_{\text{unembed}}$$ should agree with each other to some degree. Because, by ablating a layer, it should remove that layer's contribution (measured by $$\Delta_{\text{unembed}}$$) as well as ruin the downstream layer's contributions as well (the overall contributions being measured by $$\Delta_\text{ablate}$$). Ideally, $$\Delta_\text{ablate} \geq \Delta_{\text{unembed}}$$, but we see the opposite trend. This trend implies that downstream layers are recovering the ablated layer's contributions so that the final impact is still similar. 
-## So how do we use this?
 
-Now that the theoretical background of our experiment is done, let's now discuss what our goal is. We wish to see how ablating different dataset's activations over another dataset's activations causes the model to affect the logit of the predicted token. For this we shall plot the graphs for $$\Delta_\text{ablate}$$ against $$\Delta_{\text{unembed}}$$ for different datasets for a particular layer, or the average of these values for a set of layers that were indiviually ablated. 
 ## Overall summary of the process
+Now that the theoretical background of our experiment is done, let's now discuss what our goal is. We wish to see how ablating different dataset's activations over another dataset's activations causes the model to affect the logit of the predicted token. We shall plot the graphs for $$\Delta_\text{ablate}$$ against $$\Delta_{\text{unembed}}$$ for different datasets for a particular layer, or the average of these values for a set of layers that were indiviually ablated. For this, we use 3 different kinds of ablations. 
+- Zero ablation, meaning we essentially remove that layer's output entirely. 
+- Random ablation, we replace the activation with a random ablation that follows the distribution of normal inputs. 
+- Replacement ablation, where we replace the activation of an input from one dataset and substitute the activations for another input in that layer. 
+
+We wish to see which types of ablations demonstrate the hydra effect and on which layers. Also, in the case they do show hydra effect, what what can we infer from it. To visualize what Hydra effect looks like in a graph, we can refer to the ideal case given by the researchers. 
+
+![Original Hydra effect image](hydra-effect-imgs/hydra-effect-original.png)
+
+This is a graph from the Hydra effect paper. As stated in theory, if Hydra effect was absent, we expect that $$\Delta_\text{ablate}$$ and $$\Delta_{\text{unembed}}$$ should agree with each other and the scatterplot should align with the diagonal line. But we see a different scenario. Values under the diagonal line showcase the effect of Downstream repair since $$\Delta_\text{ablate}$$ < $$\Delta_{\text{unembed}}$$. 
 
 ## Implementation
 As is common with other experiments, we load the Llama-3.2-3B model in our kaggle notebook. 
@@ -100,8 +108,6 @@ def make_hook(block_type, layer_idx):
         elif mode.startswith("replace::"): # eg mode = replace::python
             dataset_name = mode.split("::")[1]
             result = random.choice(replacement_store[dataset_name][block_type][layer_idx])
-
-
         elif mode == 'random':
             std = replacement_std[block_type][layer_idx].unsqueeze(0)
             result = torch.randn_like(out_tensor) * std
@@ -128,6 +134,7 @@ for l in range(len(model.model.layers)):
 def compute_replacement_store(paragraphs, dataset_name, num_layers, max_samples, max_length=input_size)
     for key in layer_mode:
         layer_mode[key] = "capture" # Ensure all layers are set to be captured 
+
     count = 0
     for paragraph in paragraphs:
         if count >= max_samples:
@@ -161,6 +168,7 @@ for domain, path in domain_files.items():
     with open(path, 'r') as file:
         data = json.load(file)
         dataset_data[domain] = data
+
     replacement_store.update(compute_replacement_store(data[sample_size+1:], domain, num_layers=len(model.model.layers), max_samples=replacement_store_size))
 ```
 >**Note:** using `data[sample_size+1:]` instead of directly using `data` in the last line ensures that the replacements leave some samples as normal inputs and use the remaining for computation for ablations. For example, if we are normally passing as inputs the first 25 inputs, the replacement stores has the replacements from the rest of the dataset. This ensures we never mistakenly ablate the input with itself.
@@ -214,6 +222,110 @@ def delta_unembed(paragraph, max_length=INPUT_SIZE):
 2. **Forward Pass:** We pass the input and find the maximum-likelihood token. 
 3. **Unembedding Mechanism**: the unembedding matrix `W_U` is extracted as well as the final hidden states. The RMSNorm uses these values on the final layer to compute the logit probabilities. We shall apply it to each layer output.
 4. **Logit Lensing**: For each layer and block type, we extract its output as `z_tensor`. This is RMSNormed using the unembedding mechanism. THe logits are then centred and the contribution is stored in delta_mlp or delta_attn dictionary which are outputed. 
- 
 
+### Delta Ablate implementation
+```python 
+def delta_dataset_ablation(paragraph, ablation_dataset_name, target_ablation_layers=None, max_length=INPUT_SIZE, resample_size = resample_size):
+    # Step 1: Tokenization
+    inputs = tokenizer(
+        paragraph,
+        return_tensors="pt",
+        truncation=True,
+        max_length=max_length,
+        padding="max_length"
+    )
+    delta_ablation = {}
+    delta_ablation = {}
 
+    for key in layer_mode:
+        layer_mode[key] = 'capture'
+
+    # Step 2: Store original activations
+    with torch.no_grad():
+        outputs = model(**inputs, output_hidden_states=True)
+        original_logits = outputs.logits[0,-1]
+        original_logits -= original_logits.mean(dim=-1, keepdim=True)
+        target_token = torch.argmax(original_logits)
+
+        output = {}
+
+    # Step 3: loop through the target layers sequentially
+    for i in ablation_layers:
+        for block_type in ['mlp', 'attn']:
+            for key in layer_mode:
+                if key[0] == i:
+                    layer_mode[(key[0], block_type)] = f"replace::{ablation_dataset_name}"
+                else:
+                    layer_mode[key] = "capture"
+
+            delta_ablation[block_type][i] = 0
+            # Step 4: Compute delta ablate averaged over numerous ablations
+            for _ in range(resample_size):
+                with torch.no_grad():
+                    outputs = model(**inputs, output_hidden_states=True)
+                    logits = outputs.logits[0,-1]
+                    logits -= logits.mean(dim=-1, keepdim=True)
+                    target_token = torch.argmax(original_logits)
+                    target_logit = logits[target_token]
+                    delta_ablation[block_type][i] += target_logit.item() - original_logits[target_token].item()
+            delta_ablation[block_type][i] /= resample_size
+
+    return delta_ablation
+```
+>Note: This same function can be adapted to be used for zero ablation and random ablation by simply changing `layer_mode[(key[0], block_type)] = f"replace::{ablation_dataset_name}"` to `layer_mode[(key[0], block_type)] = "zero"` in step 3
+
+**Explanation:** The function takes in a list of layers to be ablation. Note that at each step it only ablates one layer. This function implements $$\Delta_\text{ablate}$$ for each input of a dataset. The steps involved are:
+1. **Tokenizing:** The input paragraph is tokenized and then the layer modes are all set to capture
+2. **Storing original Activations:** The original activations for the input is stored. From it, we can access the logit for the `target_token`. This is $$\^\pi_i(x_{\leq t})$$.
+3. **Looping Through target layers:** For a single input, different layers are ablated and the delta ablations are stored. For example, if the list is `[15, 20, 21]` and `resample_size` is 5, then the layer 15 is ablated with 5 different activations and the average `delta_ablate` is stored and then continued for next layer. 
+4. **Computing the delta ablate:** The new logits are recentred and then the change in logit of the maximum-likelihood token is computed as `target_logit - original_logits[target_token]`. This is done `resample_size` times and the result is averaged and stored for that layer. 
+
+#### Computing ablations
+```python
+def compute_ablation_data_combined(dataset_data, target_layers,sample_size=sample_size, output_path="combined_ablation_results.json"):
+
+    num_layers = len(model.model.layers)
+    all_results = defaultdict(lambda: defaultdict(list))
+
+    # Permute through all source and ablation datasets
+    for source_name, paragraphs in dataset_data.items():
+        for ablation_dataset_name in dataset_data.keys():
+            for paragraph in paragraphs:
+                delta_ablation = delta_dataset_ablation(
+                    paragraph,
+                    ablation_dataset_name=ablation_dataset_name,
+                    target_ablation_layers=ablation_layers,
+                    max_length=input_size
+                )
+
+                all_results[source_name][ablation_dataset_name].append({
+                    "delta_mlp": delta_ablation["mlp"],
+                    "delta_attn": delta_alation["attn"],
+                })
+
+    # Convert defaultdict to regular dict for JSON serialization
+    clean_results = {k: dict(v) for k, v in all_results.items()}
+
+    with open(output_path, 'w') as f:
+        json.dump(clean_results, f, indent=2)
+
+```
+**Explanation:** This function performs ablation across all combinations of source and target datasets. For each input paragraph in the datasets, it ablates the specified target layers and measures the impact on the model’s output. The `dataset_data` argument is a dictionary where each key is a dataset name and the value is a list of input paragraphs. The `target_layers` list specifies which layers should be ablated during the experiment. 
+
+Once all computations are complete, the results are saved as a JSON file to the location specified by `output_path`. This format of saving in JSON file allows us to display and create graphs more easily later on. 
+
+Similar functions are used to compute delta unembeds and the zero/random ablations. 
+
+## Results 
+The graphs are for either MLP layer ablations or ATTN layer ablations over either a set of layers or for specific layers. Below are some of the notable outputs that we have observed. 
+### Per Layer Hydra Effect
+
+![alt text](hydra-effect-imgs/cpp-layerwise.gif)
+
+![alt text](hydra-effect-imgs/math_solution-layerwise.gif)
+
+![alt text](hydra-effect-imgs/math_think-layerwise.gif)
+
+![alt text](hydra-effect-imgs/physics-layerwise.gif)
+
+![alt text](hydra-effect-imgs/python-layerwise.gif)
