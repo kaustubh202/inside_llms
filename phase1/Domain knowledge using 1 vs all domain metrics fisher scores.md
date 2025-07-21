@@ -34,12 +34,19 @@ Yaha hypothesize karna padega
 ### * For datasets like 'python' and 'cpp':
 * We obtain extremely interesting and insightful results for Attention blocks fisher separability scores:
   * Certain Intermediate layers (i.e. layer 16,17,19  for cpp dataset and python dataset both) give out much higher scores than other layers and other layers really are relatively consistent in their domain knowledge(note layer 0 many times contains bogus results so we are not factoring that in).
+![image_alt](https://github.com/kaustubh202/inside_llms/blob/e11be6f407c72b08ed4627e1942d5e89b3f16ed5/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/attn_cpp_fisher_heatmap.png)
+![image_alt](https://github.com/kaustubh202/inside_llms/blob/e11be6f407c72b08ed4627e1942d5e89b3f16ed5/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/attn_python_fisher_heatmap.png)
+
 
 * We also obtain insightful information for MLP blocks  fisher values:
   * For the MLP block , the python dataset "domain knowledge values" are fluctuating in the initial layers , from layer 15 onwards the value increases gradually with final layers with more knowledge than starting layers with few exceptions in between
   * For the cpp dataset MLP block, the trend is somewhat similar in the starting layers to the python dataset but there is a spike of "domain knowledge value" at around layer 15-16 , from then onwards the value drops a bit and maintains gradual increase of it's value till it's maximum value at layer 27.
+    ![image_alt](https://github.com/kaustubh202/inside_llms/blob/e11be6f407c72b08ed4627e1942d5e89b3f16ed5/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/mlp_cpp_fisher_heatmap.png)
+    ![image_alt](https://github.com/kaustubh202/inside_llms/blob/e11be6f407c72b08ed4627e1942d5e89b3f16ed5/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/mlp_python_fisher_heatmap.png)
 * Also these results are obtained for Residual stream activation fisher separability scores:
   * For both datasets The values peak around layer 3,4,5 then go down a bit , maintain till intermediate layers , from then onwards (layer 14) value spikes then  maintains value (with slight fluctuations in between).
+    ![image_alt](https://github.com/kaustubh202/inside_llms/blob/e11be6f407c72b08ed4627e1942d5e89b3f16ed5/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/resid_cpp_fisher_heatmap.png)
+    ![image_alt](https://github.com/kaustubh202/inside_llms/blob/e11be6f407c72b08ed4627e1942d5e89b3f16ed5/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/resid_python_fisher_heatmap.png)
 
 ### * For datasets like 'physics':
 
