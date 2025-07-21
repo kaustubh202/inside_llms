@@ -324,12 +324,16 @@ Each dataset has different behaviours for ablating a single layer. The best resu
 
 ![CPP Dataset Layerwise](hydra-effect-imgs/cpp-layerwise-looped.gif)
 
-**Inference**: In early layers, the `delta_ablation` is very high as expected while `delta_unembed` is low since these layers have little contribution initially. Till layer 15 this pattern is observed, however later layers start to show hydra effect more clearly. Layer 17-18 are unable to show any Hydra effect for math datasets and random ablation is most cases, however cpp and python show clear recoveries. Layer 22 and beyond are able to recover more aggressively. The location of zero clusters are great indicators of the quantity of information present in the residual stream that can be used for recovery. Till ablation of layer 18, zero clusters were present on the diagonal line but afterwards they start to shift downwards. By layer 24, clusters of math datasets have moved away from random clusters as well. This shows the model has sufficient context to recover tokens even from these ablations as well.
+**Inference**: In early layers, the `delta_ablation` is very high as expected while `delta_unembed` is low since these layers have little contribution initially. Till layer 15 this pattern is observed, however later layers start to show hydra effect more clearly. 
+Layer 17-18 are unable to show any Hydra effect for math datasets and random ablation is most cases, however cpp and python show clear recoveries. Layer 22 and beyond are able to recover more aggressively. 
+The location of zero clusters are great indicators of the quantity of information present in the residual stream that can be used for recovery. Till ablation of layer 18, zero clusters were present on the diagonal line but afterwards they start to shift downwards. By layer 24, clusters of math datasets have moved away from random clusters as well. This shows the model has sufficient context to recover tokens even from these ablations as well.
 #### Math Solution Dataset
 
 ![Math Solution Dataset Layerwise](hydra-effect-imgs/math_solution-layerwise-looped.gif)
 
-**Inference:** In this dataset, the behaviour is vastly different from other datasets. ablations in this dataset using more english-style datasets causes worse effects than zero ablations and random ablations. This effect is clear in the early layers from layer 1 to 6. These layers when ablated with other datasets breakdown very quickly. Hence we can say they are highly important for this dataset specifically. Layer 8 till 15 can generally recover without much differentiation between other datasets. The clusters for zero and random ablations completely overlap other dataset ablations. This implies later layers cannot differentiate much between ablations and treat them equally. However `delta_ablation` and `delta_unembed` are not correlated at all for the middle layers. Layer 16 and beyond, `delta_ablation` is almost always close to zero which shows very strong Hydra effect. This implies by this point residual stream has sufficient information to recover the effects of a single ablation. 
+**Inference:** In this dataset, the behaviour is vastly different from other datasets. ablations in this dataset using more english-style datasets causes worse effects than zero ablations and random ablations. This effect is clear in the early layers from layer 1 to 6. These layers when ablated with other datasets breakdown very quickly. Hence we can say they are highly important for this dataset specifically. 
+Layer 8 till 15 can generally recover without much differentiation between other datasets. The clusters for zero and random ablations completely overlap other dataset ablations. This implies later layers cannot differentiate much between ablations and treat them equally. However `delta_ablation` and `delta_unembed` are not correlated at all for the middle layers. 
+Layer 16 and beyond, `delta_ablation` is almost always close to zero which shows very strong Hydra effect. This implies by this point residual stream has sufficient information to recover the effects of a single ablation. 
 #### Math Think Dataset
 
 ![Math Think Dataset Layerwise](hydra-effect-imgs/math_think-layerwise-looped.gif)
@@ -339,6 +343,7 @@ Each dataset has different behaviours for ablating a single layer. The best resu
 #### Physics Dataset
 
 ![Physics Dataset Layerwise](hydra-effect-imgs/physics-layerwise-looped.gif)
+
 **Inference:** This Dataset and the python dataset have very interesting behavour with clear distinctions between clusters. The variation in `delta_unembed` is very small for early and middle layers. This shows that the these layers consistently contribute the same amount regardless of input. The early layers (layer 1-7) are very sensitive to breakdown by ablation, which can be seen as sharp vertical clusters since `delta_ablation` is so high. This implies these layers are essential for this dataset. 
 Many interesting conclusions can be seen by taking specific layers in isolation. For example, in layer 10, physics and python ablations cause complete recovery whereas ablations with random values or cpp/math datasets creates breakdown. This means this layer can differentiate for physics specifically. The trend continues till layer 16. 
 
@@ -355,3 +360,8 @@ Further layers also follow this trend as well and the recovery becomes much smoo
 #### Python Dataset
 
 ![Python Dataset Layerwise](hydra-effect-imgs/python-layerwise-looped.gif)
+
+The behaviour of python dataset is similar to the physics dataset, but the patterns are not as clear-cut. 
+The first 3 layers theoretically do not contribute directly to the final output, but ablating them significantly breaks down the final output. The behaviour of layers 4-7 are quite muddy and are not fully understood. Breakdowns are quite common in majority of the early and middle layers but we can see how ablating back english-type datasets shows recovery. 
+A sharp transition in behaviour is observed when we move to layer 17. This means layer 16 has added sufficient context to change the behaviour of the model. This layer shows same behaviour that was present in the physics dataset. 
+The shifting of random ablations cluster from above the line (in layer 18) to below the line (in layer 19) implies that the residual stream is starting to collect sufficient information to cause the Hydra Effect. By layer 23, no matter which ablations are performed, recovery can be clearly seen. 
