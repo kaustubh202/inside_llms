@@ -51,12 +51,24 @@ Yaha hypothesize karna padega
 ### * For datasets like 'physics':
 
 * For the Attention block The starting layers 0-7 contain the most "domain knowledge" and then value drops , maintains till intermediate layers (14) from there is a spike at intermediate layers like (15,16,17,19) and few of the last layers like 26-27.
+    ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/attn_physics_fisher_heatmap.png)
 
-* For MLP block The intermediate layers
+* For MLP block The intermediate layers the general trend is for the "domain knowledge" to increase overall in final layers starting with intermediate layers with spikes in "domain knowledge" in some layers in start ( e.g. 1,3,5,15) representing later layers to have more knowledge in general.
+   ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/mlp_physics_fisher_heatmap.png)
+* For the Residual stream activation's L-2 normalized fisher separability scores mean The trend is more uniform overall with certain intermediate layers having a spike in "domain knowledge " so more of a interesting trend overall.
+   ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/resid_physics_fisher_heatmap.png)
+### * For datasets like 'math_think' and 'math_solution'
+* For the Attention blocks:
+  ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/attn_math_solution_fisher_heatmap.png) ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/attn_math_think_fisher_heatmap.png)
 
   
+* For the MLP blocks:
+  ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/mlp_math_solution_fisher_heatmap.png)  ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/mlp_math_think_fisher_heatmap.png)
 
-      
+* For the Residual stream activation's L-2 normalized fisher separability scores mean:
+    ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/resid_math_solution_fisher_heatmap.png)   ![image_alt](https://github.com/kaustubh202/inside_llms/blob/993241ffad1abe1957ff18e3dbb9eda82a481e7b/phase1/Domain%20knowledge%201%20vs%20all%20fisher%20sep%20metric%20layer%20wise%20images/resid_math_think_fisher_heatmap.png)
+  
+        
 
 
 
