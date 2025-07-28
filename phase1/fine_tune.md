@@ -26,7 +26,7 @@ Instead of modifying a huge, pre-trained weight matrix `W` (which has millions o
 ### The Experimental Process
 
 1.  **State Capture**: Before training began, a snapshot of the initial, randomly-initialized LoRA adapter weights (`A` and `B` for all targeted modules) was saved.
-2.  **Training**: The model was fine-tuned for a single epoch on a specialized dataset (e.g., `math_solution.json`). A batch size of 2 and 4 gradient accumulation steps were used, with a learning rate of `1e-3`.
+2.  **Training**: The model was fine-tuned for a single epoch on a specialized dataset (e.g., `math_solution.json`). A batch size of 2 and 4 gradient accumulation steps were used, with a learning rate of `1e-3` and `2e-4`.
 3.  **Final State Capture**: After training, the final state of the LoRA adapter weights was captured.
 
 ## Analysis & Metrics
@@ -42,41 +42,93 @@ For each trainable LoRA adapter matrix (e.g., the `q_proj` matrix in layer 15), 
 *   **Mean Absolute Change**: `mean(abs(Δ))`. The average of the absolute values of all weight changes. **This is the key indicator of the total magnitude of adaptation.** A higher value signifies that the layer underwent more significant changes, regardless of their direction.
 *   **Variance of Absolute Change**: `var(abs(Δ))`. The variance of the absolute changes, indicating how uniformly the magnitude of change was distributed across the weights in the matrix.
 
-To create a clear, high-level overview, these individual matrix-level statistics were **aggregated by their parent transformer layer number**. This averages the metrics from the `q_proj`, `k_proj`, `v_proj`, and `o_proj` adapters for each layer, providing a macroscopic view of how learning was distributed across the model's depth.
+To create a clear, high-level overview, these individual matrix-level statistics were **aggregated by their parent transformer layer number**. This averages the metrics from the `q_proj`, `k_proj`, `v_proj`, and `o_proj` adapters as well as the `up_proj` and `down_proj` for each layer, providing a macroscopic view of how learning was distributed across the model's depth.
 
 ## Results
 
-The following plots visualize the aggregated weight changes across the model's transformer layers for different fine-tuning domains. The **Mean Change** plot (left) shows directional bias, while the **Mean Absolute Change** plot (right) reveals the magnitude of learning and is the primary focus for interpretation.
+---
 
-### Comparative Weight Changes Across Domains
+##  Comparative Weight Changes Across Domains
 
-| Mean Change Across All Domains                               | Mean Absolute Change Across All Domains                              |
-| :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
-| ![](all_mean_change.png)                                      | ![](all_abs_mean_change.png)                                          |
+### LR = 2e-4
+| Mean Change Across All Domains                                | Mean Absolute Change Across All Domains                               |
+| :------------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/4_all_mean.gif)                          | ![](fine_tune_results/4_all_abs_mean.gif)                             |
 
-### Weight Change Across Layers in Individual Domains
+### LR = 1e-3
+| Mean Change Across All Domains                                | Mean Absolute Change Across All Domains                               |
+| :------------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/3_all_mean.gif)                          | ![](fine_tune_results/3_all_abs_mean.gif)                             |
 
-**C++ Domain**
+---
+
+##  Weight Change Across Layers in Individual Domains
+
+### C++ Domain
+
+**LR = 2e-4**
 | Aggregated Mean Change (C++)                                  | Aggregated Mean Absolute Change (C++)                                 |
 | :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
-| ![](cpp_mean.png)                                             | ![](cpp_abs_mean.png)                                                 |
+| ![](fine_tune_results/4_cpp_mean.gif)                         | ![](fine_tune_results/4_cpp_abs_mean.gif)                             |
 
-**Python Domain**
+**LR = 1e-3**
+| Aggregated Mean Change (C++)                                  | Aggregated Mean Absolute Change (C++)                                 |
+| :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/3_cpp_mean.gif)                         | ![](fine_tune_results/3_cpp_abs_mean.gif)                             |
+
+---
+
+### Python Domain
+
+**LR = 2e-4**
 | Aggregated Mean Change (Python)                               | Aggregated Mean Absolute Change (Python)                              |
 | :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
-| ![](python_mean.png)                                          | ![](python_abs_mean.png)                                              |
+| ![](fine_tune_results/4_python_mean.gif)                          | ![](fine_tune_results/4_python_abs_mean.gif)                              |
 
-**Physics Domain**
-| Aggregated Mean Change (Physics)                              | Aggregated Mean Absolute Change (Physics)                             |
+**LR = 1e-3**
+| Aggregated Mean Change (Python)                               | Aggregated Mean Absolute Change (Python)                              |
 | :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
-| ![](physics_mean.png)                                         | ![](physics_abs_mean.png)                                             |
+| ![](fine_tune_results/3_python_mean.gif)                          | ![](fine_tune_results/3_python_abs_mean.gif)                              |
 
-**Mathematical Solutions Domain**
+---
+
+### Math Linguistic Domain
+
+**LR = 2e-4**
 | Aggregated Mean Change (Math Sol)                             | Aggregated Mean Absolute Change (Math Sol)                            |
 | :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
-| ![](math_sol_mean.png)                                        | ![](math_sol_abs_mean.png)                                            |
+| ![](fine_tune_results/4_math_sol_mean.gif)                     | ![](fine_tune_results/4_math_sol_abs_mean.gif)                         |
 
-**Mathematical Thought Process Domain**
+**LR = 1e-3**
+| Aggregated Mean Change (Math Sol)                             | Aggregated Mean Absolute Change (Math Sol)                            |
+| :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/3_math_sol_mean.gif)                     | ![](fine_tune_results/3_math_sol_abs_mean.gif)                         |
+
+---
+
+### Math Thinking Domain
+
+**LR = 2e-4**
 | Aggregated Mean Change (Math Think)                           | Aggregated Mean Absolute Change (Math Think)                          |
 | :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
-| ![](math_think_mean.png)                                      | ![](math_think_abs_mean.png)                                          |
+| ![](fine_tune_results/4_math_think_mean.gif)                   | ![](fine_tune_results/4_math_think_abs_mean.gif)                       |
+
+**LR = 1e-3**
+| Aggregated Mean Change (Math Think)                           | Aggregated Mean Absolute Change (Math Think)                          |
+| :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/3_math_think_mean.gif)                   | ![](fine_tune_results/3_math_think_abs_mean.gif)                       |
+
+---
+
+### Physics Domain
+
+**LR = 2e-4**
+| Aggregated Mean Change (Physics)                              | Aggregated Mean Absolute Change (Physics)                             |
+| :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/4_physics_mean.gif)                         | ![](fine_tune_results/4_physics_abs_mean.gif)                             |
+
+**LR = 1e-3**
+| Aggregated Mean Change (Physics)                              | Aggregated Mean Absolute Change (Physics)                             |
+| :-----------------------------------------------------------: | :-------------------------------------------------------------------: |
+| ![](fine_tune_results/3_physics_mean.gif)                         | ![](fine_tune_results/3_physics_abs_mean.gif)                             |
+
