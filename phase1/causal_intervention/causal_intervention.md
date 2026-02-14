@@ -96,3 +96,14 @@ $$
 In our results, we use the convention that when $A \xleftarrow{\;\ell\;} B$ is performed, we plot bias with a positive sign, and when we perform the intervention $B \xleftarrow{\;\ell\;} A$, we plot bias with a negative sign to preserve perspective with respect to the set of characteristic tokens $B$. Thus, all bias computations are visualized as the shift in preference of $B$ over $A$.
 
 ## Results
+We show the results for our experiments on Llama 3b model. Similar results have been observed in other architecutures which we have discussed in the main paper.
+#### Delta Bias 
+![Llama Attn results](llama-3b-attn-cpp-python.png)
+![Llama MLP results](llama-3b-mlp-cpp-python.png)
+Causal intervention results across all layers for Llama-3.2-3B: Delta Bias when swapping activations between C++ and Python prompts using our domain-classification task. Swapping attention activations produces large, positive  shifts at specific mid-depth layers (e.g., 13-15 , 23-25), indicating sparse routing hotspots. Error bands show standard deviation over 200 prompt pairs.
+
+#### KL Divergence 
+When we sort the layers based on their fisher seperability, we observe that layers with higher fisher seperability have higher KL divergence on activation swapping. This fact is true for both mlp and attention components. 
+![alt text](llama-3b-kl-attn.png)
+![alt text](llama-3b-kl-mlp.png)
+Analysis of layers in Llama-3B, comparing KL divergence (left) and a Delta Bias (right) between C++ and Python inputs. The layers on left section ar e layers with highest Fisher score and right section have lowest Fisher score. Top-ranked layers show substantially higher KL divergence and Delta Bias, reflecting higher influence on final output.
