@@ -2,28 +2,76 @@
 icon: hand-wave
 ---
 
-# inside_llms
+# Inside LLMs
 
-Large Language Models are the talk of the town, and as they gain more ground, it has become increasingly difficult and important to understand what's going on inside them.
-Understanding a large language model often feels like staring at a city skyline at night, there are plenty of lights, but not much sense of who’s inside which room.
-We’re a small group of undergraduate researchers who wanted to map specific “rooms” inside one large language model, trying to find layers that lean toward Mathematical Detail, others that prefer Programming Languages, and so on, without enterprise-grade GPUs. Trying to figure out where exactly domain-specific knowledge is stored in an LLM.
+We’re a small group of undergrads from the Data Science Group at IIT Roorkee who got unusually curious about one question:
 
-Our approach so far
+**What’s actually going on inside neural networks?**
 
--   **Model in scope**: _Llama 3.2-3B_ (27 transformer layers), chosen because it fits on free Kaggle GPUs. We'll delve into more models over time. (We have limited resources as "unsupervised" undergrads)
--   **Domain sets**: short corpora for C++, Python, mathematics (thinking + solutions), and physics explanations.
--   **Experiments**: forward-pass profiling, lightweight fine-tunes, logistic probes, zero-out tests, and a few interpretability touches. Details of each experiment can be found on its dedicated page.
+The _mechanisms,_ circuits, representations, algebraic structure, failure modes, all of it.
 
-What you’ll find on this site
+This space became our rabbit hole.
 
-1. **Formal Objective** – the page spelling out the research question and evaluation criteria.
-2. **Mech Interp Experiments** – the step-by-step experiments we performed with plots and takeaway notes.
-3. **Concept Vectors** – the concept of trying to represent domain knowledge as directions in hidden space.
-4. **Conclusion** – what the results suggest about modularity and future compression work.
-5. **Team** – faces, emails, and other details about us.
+***
 
-Our gitbook link: https://inside-llms.gitbook.io/surgical-domain-discovery
+### Why this exists
 
-We’ll keep updating as new tests run (or crash). Feedback and replication attempts are welcome; open a pull request or mail us anytime.
+A lot of ML research focuses on _what models can do_.\
+Mechanistic interpretability asks something different:
 
-_Inside LLMs_ is a work in progress, shared openly so the conversation can start before the finish line.
+> **How are they doing it?**
+
+That question pulled us into probing attention layers, dissecting MLPs, testing causal interventions, studying fine-tuning shifts, and even poking at ideas like self-modeling, model introspection, and more interpretable foundational architectures.
+
+Some of this became workshop papers, some rejected submissions, some ongoing experiments, and some things we’re still confused about.&#x20;
+
+***
+
+### What you’ll find here
+
+This GitBook is basically our running research notebook:
+
+* Explorations into domain specialization in LLM components
+* Work on bilinear MLPs and algebraic structure in neural computation
+* Experiments on self-modeling and introspective behaviour
+* Experiments on probing, causal interventions, fine-tuning dynamics, and other mech-interp curiosities
+
+If it worked, we explain it.\
+If it didn’t, we try to explain that too.
+
+***
+
+### Who we are (and who we aren’t)
+
+We’re not a formal lab.
+
+Just a bunch of students who:
+
+* ask slightly obsessive questions about models
+* try to read and understand mech-interp papers
+* run questionable experiments at 2 AM
+* and somehow keep coming back for more
+
+The team section below has the details of the students behind this.
+
+***
+
+### Why make this public?
+
+Because mech-interp benefits from openness:
+
+* ideas cross-pollinate fast
+* half-formed intuitions sometimes help others
+* and honestly, we learned most of this from people who shared generously.
+
+So this is our attempt to do the same.
+
+If you’re into interpretability, alignment, or just curious how neural nets tick, our guess is you’ll probably find something interesting here.
+
+And if not, at least you’ll know some IITR undergrads tried 🙂
+
+
+
+
+
+P.S. If you want to contact us, you can find the details on the Our Team page.

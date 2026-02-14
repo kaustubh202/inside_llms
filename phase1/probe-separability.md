@@ -12,7 +12,7 @@ Our goal with probing is to see if the internal representations (the "signals" o
 
 ## What Exactly is Probing?
 
-At its heart, probing is about training a very simple classifier to predict a property (like the domain of a text) using *only* the raw activations from inside the LLM. If this simple classifier succeeds, it tells us that the LLM has learned to represent that property in a way that's easy to "decode". The datasets and the model remain the same as from our previous experiments.
+At its heart, probing is about training a very simple classifier to predict a property (like the domain of a text) using _only_ the raw activations from inside the LLM. If this simple classifier succeeds, it tells us that the LLM has learned to represent that property in a way that's easy to "decode". The datasets and the model remain the same as from our previous experiments.
 
 ### The Probes
 
@@ -88,7 +88,6 @@ Our probing experiment involved a systematic scan across Llama 3.2-3B's entire a
 3. **Evaluate:** Finally, we evaluated the probe's performance using our suite of metrics.
 4. **Repeat:** We repeated this entire process for every layer and every component type, building a detailed map of domain knowledge throughout the model.
 
-
 Here's a high-level conceptual view of the main loop:
 
 ```python
@@ -121,22 +120,19 @@ Here's a high-level conceptual view of the main loop:
 
 ### The Accuracy Problem
 
-Once we've captured the internal signals (activations), we need a way to "decode" them. Initially, we decided to use **Logistic Regression** as our decoder. This is a very simple, linear classifier. The reason we choose a *linear* model is crucial: if a linear probe can accurately classify the domain from a layer's activations, it means the domain-specific information is clearly separated and easily accessible within that layer. However, our analysis of Llama 3.1-3B revealed that domain knowledge is omni-present in the model. The Logistic Regression probe achieved nearly **100% accuracy** across almost all layers. While this confirms the presence of domain information, it acted as a dead-end for analyzing the internal structure of exactly *how* that information is represented.
-
-
+Once we've captured the internal signals (activations), we need a way to "decode" them. Initially, we decided to use **Logistic Regression** as our decoder. This is a very simple, linear classifier. The reason we choose a _linear_ model is crucial: if a linear probe can accurately classify the domain from a layer's activations, it means the domain-specific information is clearly separated and easily accessible within that layer. However, our analysis of Llama 3.1-3B revealed that domain knowledge is omni-present in the model. The Logistic Regression probe achieved nearly **100% accuracy** across almost all layers. While this confirms the presence of domain information, it acted as a dead-end for analyzing the internal structure of exactly _how_ that information is represented.
 
 ### Our Metrics for Separability
 
-
 Due to the perfect accuracy probelm, we turned to more sensitive metrics like **Fisher Separability Score** and **Maximum Mean Discrepancy (MMD)**–they provide a deeper understanding of the quality and linear separability of the domain information within the model's internal representations.
-* **Fisher Separability Score:** This score measures how "spread out" the different domain clusters are in the activation space. A higher Fisher score indicates that the activations for different domains are far apart and tightly clustered, making them very easy for our linear probe to distinguish. The Fisher Separability Score for two classes, C_1 and C_2, with means and variances is defined as:
 
-  $$F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$$
+*   **Fisher Separability Score:** This score measures how "spread out" the different domain clusters are in the activation space. A higher Fisher score indicates that the activations for different domains are far apart and tightly clustered, making them very easy for our linear probe to distinguish. The Fisher Separability Score for two classes, C\_1 and C\_2, with means and variances is defined as:
 
-  In a multi-dimensional feature space, this extends to the ratio of between-class variance to within-class variance.
+    $$F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$$
 
+    In a multi-dimensional feature space, this extends to the ratio of between-class variance to within-class variance.
+*   **Maximum Mean Discrepancy (MMD):** It is a kernel-based test that measures distance between two probability distributions. The squared MMD is defined as:
 
-* **Maximum Mean Discrepancy (MMD):** It is a kernel-based test that measures distance between two probability distributions. The squared MMD is defined as:  
     $$
     \operatorname{MMD}^2(P, Q)
     =
@@ -148,9 +144,10 @@ Due to the perfect accuracy probelm, we turned to more sensitive metrics like **
     $$
 
     where:
-    - $$k(\cdot, \cdot)$$ is a positive-definite kernel (e.g., Gaussian RBF),
-    - $$x, x' \sim P$$,
-    - $$y, y' \sim Q$$. A larger MMD value means the two distributions are more dissimilar. When using a characteristic kernel (such as Gaussian RBF), MMD equals zero when the two distributions are identical. Unlike trivial mean comparisons, MMD captures differences in means, variances, and higher-order structure depending on the chosen kernel.
+
+    * $$k(\cdot, \cdot)$$ is a positive-definite kernel (e.g., Gaussian RBF),
+    * $$x, x' \sim P$$,
+    * $$y, y' \sim Q$$. A larger MMD value means the two distributions are more dissimilar. When using a characteristic kernel (such as Gaussian RBF), MMD equals zero when the two distributions are identical. Unlike trivial mean comparisons, MMD captures differences in means, variances, and higher-order structure depending on the chosen kernel.
 
 These distributional metrics helped us overcome the dead-end provided by Logistic Regression. We found that Fisher and MMD scores did not saturate, and hence produced nearly overlapping results after normalization. This synchronization confirms that the trends we observe are not a fluke, and they genuinely do reveal structural features of the residual stream.
 
@@ -160,65 +157,33 @@ These distributional metrics helped us overcome the dead-end provided by Logisti
 
 Each column displays **Attention (top)** and **MLP (bottom)** blocks for one domain.
 
----
+***
 
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+<p align="center"><strong>C++</strong></p>
 
-<div>
-<h4 align="center">C++</h4>
-<p align="center">
-<img src="iclr_graphs/attn_CPP.png" width="100%"><br>
-<img src="iclr_graphs/mlp_CPP.png" width="100%">
-</p>
-</div>
+<p align="center"><img src="../.gitbook/assets/attn_CPP.png" alt=""><br><img src="../.gitbook/assets/mlp_CPP.png" alt=""></p>
 
-<div>
-<h4 align="center">Python</h4>
-<p align="center">
-<img src="iclr_graphs/attn_Python.png" width="100%"><br>
-<img src="iclr_graphs/mlp_Python.png" width="100%">
-</p>
-</div>
+<p align="center"><strong>Python</strong></p>
 
-<div>
-<h4 align="center">Math</h4>
-<p align="center">
-<img src="iclr_graphs/attn_Math.png" width="100%"><br>
-<img src="iclr_graphs/mlp_Math.png" width="100%">
-</p>
-</div>
+<p align="center"><img src="../.gitbook/assets/attn_Python.png" alt=""><br><img src="../.gitbook/assets/mlp_Python.png" alt=""></p>
 
-<div>
-<h4 align="center">Medical</h4>
-<p align="center">
-<img src="iclr_graphs/attn_Medical.png" width="100%"><br>
-<img src="iclr_graphs/mlp_Medical.png" width="100%">
-</p>
-</div>
+<p align="center"><strong>Math</strong></p>
 
-<div>
-<h4 align="center">Science</h4>
-<p align="center">
-<img src="iclr_graphs/attn_Science.png" width="100%"><br>
-<img src="iclr_graphs/mlp_Science.png" width="100%">
-</p>
-</div>
+<p align="center"><img src="../.gitbook/assets/attn_Math.png" alt=""><br><img src="../.gitbook/assets/mlp_Math.png" alt=""></p>
 
-<div>
-<h4 align="center">Finance</h4>
-<p align="center">
-<img src="iclr_graphs/attn_Finance.png" width="100%"><br>
-<img src="iclr_graphs/mlp_Finance.png" width="100%">
-</p>
-</div>
+<p align="center"><strong>Medical</strong></p>
 
-</div>
+<p align="center"><img src="../.gitbook/assets/attn_Medical.png" alt=""><br><img src="../.gitbook/assets/mlp_Medical.png" alt=""></p>
 
+<p align="center"><strong>Science</strong></p>
 
+<p align="center"><img src="../.gitbook/assets/attn_Science.png" alt=""><br><img src="../.gitbook/assets/mlp_Science.png" alt=""></p>
+
+<p align="center"><strong>Finance</strong></p>
+
+<p align="center"><img src="../.gitbook/assets/attn_Finance.png" alt=""><br><img src="../.gitbook/assets/mlp_Finance.png" alt=""></p>
 
 Our most significant discovery from probe separability analysis is structural divergence between components, supported by both Fisher and MMD metrics:
 
 * Attention Layers: They show high variability across depth. Instead of a smooth line, we observe sharp peaks or "hotspots", particularly in the mid-to-deep layers. This indicates that specific attention layers possess highly disentangled, non-linear representations of domain identity. They act as routers steering domain identity.
-
 * MLPs: MLP outputs show small variance across all layers, indicating that MLPs process domain features in a uniform and distributed manner. They possess uniformly-distributed knowledge of all domains and simply act as computational units. They process domain-specific features broadly and uniformly throughout the network, implementing the "thinking" required for that domain rather than making high-level routing decisions.
-
