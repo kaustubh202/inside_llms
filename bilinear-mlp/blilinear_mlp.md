@@ -13,16 +13,19 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 
 > Note: For the bilinear model, extracting the interaction matrix using stacked logits gave “exactly” the same values as extracting them from weights, providing credibility.
 
-### What we Found
+### What We Found
 
 **For the graph relation:** This one surprised me the most. We trained both models on a simple successor relation — “what comes next” — on a cycle of $N = 400$ nodes: $$i \;\mapsto\; (i + 1) \bmod N.$$ We extracted the transition matrix $T$ from the models and recursively applied it to predict $k$ steps ahead: $$T^k$$ so that the $k$-step prediction corresponds to $$T^k x.$$
 
-* **Bilinear:** Maintained perfect accuracy up to k≈80 steps. wet learned a near-perfect permutation matrix (Mean Column Entropy $0.74$)
-* **SwiGLU:** Maintained perfect accuracy up to k≈50 steps, then dropped slowly.
-* **ReLU:** Collapsed immediately ($$k$$<5). wets matrix was diffuse and "messy" (Entropy 4.89)
+* **Bilinear:** Maintained perfect accuracy up to $k \approx 80$ steps. wet learned a near-perfect permutation matrix (Mean Column Entropy $0.74$)
+* **SwiGLU:** Maintained perfect accuracy up to $k \approx 50$ steps, then dropped slowly.
+* **ReLU:** Collapsed immediately ($$k$$<5). wets matrix was diffuse and "messy" (Entropy $4.89$)
 
-> Multi-step composition behaviour of the learned transition operator $$T$$ (taken by taking the softmax of the logits over the vocabulary). The plot shows $k$-step accuracy Acc(k) of $$T^k$$ compared to the true $$k$$-step successor on the cycle.
-> Distribution of column entropies $H(h)$ for the learned transition operator $T$ on the cycle graph.
+![Multi-step composition R^k plot](./images/comp.png)
+*Figure — Multi-step composition behaviour of the learned transition operator $T$ (taken by taking the softmax of the logits over the vocabulary). The plot shows $k$-step accuracy Acc($k$) of $$T^k$$ compared to the true $k$-step successor on the cycle.*
+
+![Column Entropy](./images/entropy.png)
+*Figure — Distribution of column entropies $H(h)$ for the learned transition operator $T$ on the cycle graph.*
 
 **For modular addition:** The ground truth for modular addition is diagonal in the Fourier basis.
 
@@ -39,7 +42,7 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 
 
 
-> The bilinear one has a diagonal band, ReLU is mostly white with a few bright spots (marked in red), and SwiGLU lies somewhere in between.
+*Figure — The bilinear one has a diagonal band, ReLU is mostly white with a few bright spots (marked in red), and SwiGLU lies somewhere in between.*
 > Here are the entropy numbers: ground truth is 4.57, bilinear gets 4.33, SwiGLU gets 2.87, and ReLU gets 0.37.
 
 **For modular multiplication:** For multiplication, we analyzed the effective rank of the interaction matrices using Singular Value Decomposition (SVD).
@@ -103,7 +106,7 @@ The ground truth operator for addition mod p is circulant; it's diagonal in the 
 
 The bilinear spectra look almost exactly like the ground truth. There's this clean diagonal band in the (u,v) frequency plane. When we compute the entropy of the power spectrum, we get 4.33 on average across classes. Ground truth is $4.57$. They're nearly matching the ideal structure.
 
-SwiGLU shows an intermediate structure. You can see traces of the diagonal pattern in its Fourier spectrum, with entropy 2.87, more structured than ReLU but less clean than bilinear.
+SwiGLU shows an intermediate structure. You can see traces of the diagonal pattern in its Fourier spectrum, with entropy $2.87$, more structured than ReLU but less clean than bilinear.
 
 The ReLU spectra are completely different. Energy is concentrated in a tiny number of frequencies, usually $5-7$ dominant peaks with everything else near zero. Average entropy: $0.37$. That's an order of magnitude lower. It's solving the task, but not by learning the circulant structure. [See Figure 1 and Figure 2]
 
@@ -125,7 +128,7 @@ For the graph task, we trained both models on the one-step relation $$R_1(h) = (
 
 Then we extracted a transition matrix $T$ where $$T[t,h] = \text{probability of tail } t \text{ given head } h.$$
 
-The bilinear model's $T$ has very sharp columns. Each column is nearly one-hot, with almost all probability mass on a single tail. Column entropy averages 0.74 (a perfect permutation would be 0, a uniform distribution would be ~6). The ReLU model's columns are diffuse, entropy 4.89, and almost uniform. SwiGLU's $T$ has more focused columns than ReLU, but not as sharp as bilinear. Column entropy averages 1.09; you can see a peak in each column, but with more spread than bilinear's near one-hot structure.
+The bilinear model's $T$ has very sharp columns. Each column is nearly one-hot, with almost all probability mass on a single tail. Column entropy averages 0.74 (a perfect permutation would be 0, a uniform distribution would be ~6). The ReLU model's columns are diffuse, entropy $4.89$, and almost uniform. SwiGLU's $T$ has more focused columns than ReLU, but not as sharp as bilinear. Column entropy averages 1.09; you can see a peak in each column, but with more spread than bilinear's near one-hot structure.
 
 But the composition behavior is what really got me. We kept multiplying $T$ by itself to get $$T^k$$, then for each head, we compared the predicted tail to the true $k$-step successor $$(h+k) \bmod N.$$
 
@@ -142,7 +145,7 @@ At $$k > 120$$, all the models had lost their capability to predict the true val
 
 The bilinear architecture forces every interaction between input features to go through an explicit tensor $$T_{ijk} = (W_1)_{ik}(W_2)_{jk}$$. This is a strong constraint. You can't create arbitrary combinations. In other words, everything has to factor nicely.
 
-SwiGLU sits in between. Its element-wise multiplication (gate $\odot$ value) provides some factorization constraint; each hidden unit comes from an explicit product of two learned projections. But the nonlinearity (SiLU activation) and the fact that both projections use the same input (unlike bilinear's separate $x$$ and $y$) make them less clean.
+SwiGLU sits in between. Its element-wise multiplication (gate $\odot$ value) provides some factorization constraint; each hidden unit comes from an explicit product of two learned projections. But the nonlinearity (SiLU activation) and the fact that both projections use the same input (unlike bilinear's separate $x$ and $y$) make them less clean.
 
 ReLU has no such constraint. You can superimpose features, use polysemantic neurons, and spread computation across the hidden layer however you want. It's more flexible, which, for some tasks, might be necessary. But for these structured tasks, that flexibility leads to messier solutions.
 
