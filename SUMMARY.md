@@ -8,6 +8,7 @@
     -   [Probe Separability](phase1/probe-separability.md)
     -   [Hydra Effect](phase1/hydra-effect.md)
     -   [Zero Out Tests](phase1/zero-out-tests.md)
+    -   [Causal Intervention](phase1/causal_intervention/causal_intervention.md)
 -   [Belief State Geometry](belief-state-geometry/belief_state.md)
 -   [Bilinear MLP](bilinear-mlp/blilinear_mlp.md)
 -   [Self Awareness](self-awareness/self_awareness.md)
