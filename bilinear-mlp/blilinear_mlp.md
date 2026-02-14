@@ -33,7 +33,7 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 <!-- put the file at docs/images/multi-step.png -->
 <figure>
   <img src="./images/entropy.png" 
-  style="max-width:100%; height:auto;" />
+  style="max-width:75%; height:auto;" />
   <figcaption style="text-align:center; font-size:0.95em; color:#555;">
     Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.
   </figcaption>
@@ -58,15 +58,15 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 <!-- put the file at docs/images/fourier.png -->
 <figure>
   <img src="./images/fourier.png" 
-  style="max-width:100%; height:auto;" />
+  style="max-width:75%; height:auto;" />
   <figcaption style="text-align:center; font-size:0.95em; color:#555;">
     Fourier analysis of the learned operators for modular addition. The plot shows the learned interaction matrices for each architecture. The bilinear model learns a diagonal matrix, the ReLU model learns a sparse matrix, and the SwiGLU model learns a matrix that is somewhere in between.
   </figcaption>
 </figure>
 
 <figure>
-  <img src="images/entropy.png" 
-  style="max-width:100%; height:auto;" />
+  <img src="images/spectral.png" 
+  style="max-width:75%; height:auto;" />
   <figcaption style="text-align:center; font-size:0.95em; color:#555;">
     Here are the entropy numbers: ground truth is $$4.57$$, bilinear gets $$4.33$$, SwiGLU gets $$2.87$$, and ReLU gets $$0.37$$.
   </figcaption>
