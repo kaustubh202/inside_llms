@@ -31,7 +31,7 @@ $$
 
 ### RLCT Analysis: Effective Complexity
 
-Despite similar validation accuracy across all models (~94.8%), the internal geometry of the solutions differed significantly. We estimated the **Real Log Canonical Threshold (RLCT)** via Stochastic Gradient Langevin Dynamics (SGLD). Lower RLCT values indicate a lower "effective dimension" of the singular posterior—a proxy for a simpler solution basin.
+Despite similar validation accuracy across all models (~94.8%), the internal geometry of the solutions differed significantly. We estimated the **Real Log Canonical Threshold (RLCT)** via Stochastic Gradient Langevin Dynamics (SGLD). Lower RLCT values indicate a lower "effective dimension" of the singular posterior, effectively a proxy for a simpler solution basin.
 
 The Self-Model achieved a significantly lower RLCT, effectively pruning complexity without explicit weight decay.
 
