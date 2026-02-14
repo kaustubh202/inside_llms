@@ -18,8 +18,8 @@ We initiate a forward pass with a query and extract the raw logits ($$z$$) for t
 1. **Prior Construction:**
 We synthesize a counter-factual prior by permuting the baseline logit values. Specifically, we reassign the logit of the correct token ($$t_c$$) to the incorrect token ($$t_i$$), creating a distribution where $$z(t_i) \gg z(t_c)$$.
 1. **Prompt Injection:**
-We fed this prior back into the model using a structured prompt designed to condition the generation on a specific internal state.  
-`Question: [Query] Logits: {$t_c$: $z_i$}, {$t_i$: $z_c$} Answer the question based on the logits.`
+We fed this prior back into the model using a structured prompt designed to condition the generation on a specific internal state.    
+Question: [Query] Logits: {$$t_c$$: $$z_i$$}, {$$t_i$$: $$z_c$$} Answer the question based on the logits.
 
 To quantify the extent to which the model's distribution is steered by the given prior, we restricted our analysis to the 2D logit subspace defined by our target tokens $$(t_c, t_i)$$.
 
@@ -62,7 +62,7 @@ $$
 We conducted this study using `Llama 3.1 8B-instruct`. Our dataset consisted of ~100 distinct prompts , each consisting of a simple factual base prompt (e.g.,`The capital of France is ` ). For each prompt, we identified a target pair consisting of one factually correct token (e.g., `Paris`) and one high-probability counter-factual token (e.g., `London` or `Berlin`) to serve as our steering targets.
 
 ## Results
-![Distribution of $$\alpha$$ across dataset](alpha_distribution.png)
+![Distribution of steering coefficient across dataset](alpha_distribution_final.png)
 
 Based on the above results, we observe a consistent positive shift in the steering coefficient ($$\alpha$$), with the vast majority of samples falling above zero. This indicates that the model actively integrated the injected prior logits, shifting its internal probability distribution away from its factual knowledge and toward the counter-factual targets. This confirms that generation is steerable with externally injected priors, effectively overriding the model's pre-trained parametric knowledge.
 
