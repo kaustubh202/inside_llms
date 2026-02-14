@@ -48,7 +48,7 @@ The Self-Model reduced effective complexity by ~17% compared to L2 regularizatio
 
 We evaluated noise resilience by injecting Gaussian perturbations. The Self-Model maintained accuracy significantly longer than the L2 baseline, indicating a flatter local minimum.
 
-![Robustness Stress Test: L2 vs Self-Modeling](self-modeling/gaussian_stress.png)
+![Robustness Stress Test: L2 vs Self-Modeling](gaussian_stress.png)
 
 ### Conclusion
 
