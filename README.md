@@ -6,11 +6,11 @@ icon: hand-wave
 
 We’re a small group of undergrads from the [Data Science Group](https://dsgiitr.in/) at IIT Roorkee who got unusually curious about one question:
 
-**What’s actually going on inside neural networks?**
+What’s actually going on inside neural networks?
 
-The _mechanisms,_ circuits, representations, algebraic structure, failure modes, all of it.
+_The mechanisms,_ circuits, representations, algebraic structure, failure modes, all of it.
 
-This space became our rabbit hole.
+This GitBook is where we document that curiosity.
 
 ***
 
@@ -29,14 +29,17 @@ Some of this became workshop papers, some rejected submissions, some ongoing exp
 
 ### What you’ll find here
 
-This GitBook is basically our running research notebook:
+Think of this GitBook as a **public research notebook**.
 
-* Explorations into domain specialization in LLM components
-* Work on bilinear MLPs and algebraic structure in neural computation
-* Experiments on self-modeling and introspective behaviour
-* Experiments on probing, causal interventions, fine-tuning dynamics, and other mech-interp curiosities
+Inside:
 
-If it worked, we explain it.\
+* Work on domain specialization and circuit discovery in LLMs
+* Our AAAI workshop paper on bilinear MLP interpretability
+* Experiments on self-modeling and model introspection
+* Probing studies, causal interventions, fine-tuning analyses
+* Random mech-interp curiosities we didn't resist exploring
+
+If something worked, we explain it.\
 If it didn’t, we try to explain that too.
 
 ***
@@ -52,7 +55,7 @@ Just a bunch of students who:
 * run questionable experiments at 2 AM
 * and somehow keep coming back for more
 
-The team section below has the details of the students behind this.
+You’ll find the humans behind this in the **Our Team** section below.
 
 ***
 
@@ -70,8 +73,6 @@ If you’re into interpretability, alignment, or just curious how neural nets ti
 
 And if not, at least you’ll know some IITR undergrads tried 🙂
 
+\---
 
-
-
-
-P.S. If you want to contact us, you can find the details on the Our Team page.
+**P.S.** Contact details are on the Team page if you want to reach out.
