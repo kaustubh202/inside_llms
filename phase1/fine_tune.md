@@ -1,47 +1,43 @@
-# Layer-Domain Control: A Mechanistic Study of Domain Specialization
-
-##  Objective
+# Fine Tuning 
 
 This experiment focuses on the **Adaptational Analysis**, which aims to identify and quantify which parameters change the most when the model is fine-tuned on a new domain, thereby revealing the primary locus of learning. 
 
 
-##  Fine-Tuning Methodology
+##  Methodology
 
-To map where domain-specific knowledge is written during adaptation, we employed a systematic, LoRA-based fine-tuning methodology across four models (**Llama 3.2 3B, Llama 3.2 1B, Gemma 3 4B, and Gemma 3 1B**) and six distinct domains (**C++, Python, Math, Science, Finance, and Medical**).
+To map where domain-specific knowledge is written during adaptation, we employed a systematic, LoRA-based fine-tuning methodology across four models (Llama 3.2 3B, Llama 3.2 1B, Gemma 3 4B, and Gemma 3 1B) and six distinct domains (C++, Python, Math, Science, Finance, and Medical).
 
 ### Parameter-Efficient Adaptation with LoRA
 
-We use Low-Rank Adaptation (LoRA) as a principled and efficient proxy for full fine-tuning. Instead of updating a large pre-trained weight matrix $W$, LoRA introduces a low-rank decomposition of the weight update $\Delta W$. For a given layer $\ell$, the update is defined as:
+We use Low-Rank Adaptation (LoRA) as a principled and efficient proxy for full fine-tuning. Instead of updating a large pre-trained weight matrix $$W$$, LoRA introduces a low-rank decomposition of the weight update $$\Delta W$$. For a given layer $$\ell$$, the update is defined as:
 
 $$
 \Delta W_\ell = \frac{\alpha}{r} B_\ell A_\ell
 $$
 
-where $A_\ell \in \mathbb{R}^{r \times m}$ and $B_\ell \in \mathbb{R}^{n \times r}$ are the low-rank adapter matrices, $r$ is the rank, and $\alpha$ is a scaling factor. Only the parameters of $A_\ell$ and $B_\ell$ are trained. Research indicates that the matrix representing the change in weights during full fine-tuning tends to have a low intrinsic rank, making LoRA a valid and principled approximation of the full fine-tuning process.
+where $$A_\ell \in \mathbb{R}^{r \times m}$$ and $$B_\ell \in \mathbb{R}^{n \times r}$$ are the low-rank adapter matrices, $r$ is the rank, and $$\alpha$$ is a scaling factor. Only the parameters of $$A_\ell$$ and $$B_\ell$$ are trained. The matrix representing the change in weights during full fine-tuning tends to have a low intrinsic rank, making LoRA a valid and principled approximation of the full fine-tuning process.
 
 
 ## Why Lora is a Valid Proxy for full training 
 
 Instead of modifying a huge, pre-trained weight matrix `W` (which has millions of parameters), LoRA keeps `W` frozen. It learns the *change* to the weights, `ΔW`, by representing this change as the product of two much smaller, "low-rank" matrices, `A` and `B`. During a forward pass, the model's output is calculated as `h = Wx + BAx`. Only `A` and `B` are trained. Because `A` and `B` are tiny compared to `W`, we are training only a fraction of a percent of the total parameters, leading to massive savings in memory and computation time.
 
-**Why This Shows Similar Results to Full Training:** This experiment's methodology is grounded in a key research finding known as the **"low-rank hypothesis."** Studies have shown that when large pre-trained models are fully fine-tuned, the matrix representing the change in weights (`ΔW = W_final - W_initial`) tends to have a very low "intrinsic rank." This means the complex update across millions of parameters can be effectively approximated without losing significant information. LoRA is explicitly designed to create such a low-rank update. Therefore, by constraining the update to be low-rank, LoRA is not just an efficiency hack; it's a **principled approximation of the full fine-tuning process.** Analyzing where LoRA applies its largest changes gives us a strong and valid insight into which layers would have been most modified during a full fine-tuning run.
-
 
 ### Quantifying Adaptation: The Frobenius Norm
 
-Our primary metric for quantifying the magnitude of change in a layer is the **Frobenius norm** of the effective weight update, $S_\ell$. A higher value for $S_\ell$ indicates that the parameters in that layer are a primary site for storing new, domain-specific computation learned during adaptation.
+Our primary metric for quantifying the magnitude of change in a layer is the **Frobenius norm** of the effective weight update, $$S_\ell$$. A higher value for $$S_\ell$$ indicates that the parameters in that layer are a primary site for storing new, domain-specific computation learned during adaptation.
 
 $$
 S_\ell = \|\Delta W_\ell\|_F
 $$
 
-For a comprehensive view, we aggregate the norms of all adapted components within a single Transformer block (e.g., `q_proj`, `k_proj`, `v_proj`, `o_proj` for attention) by summation: $S_{\ell}^{\text{block}} = \sum_{t \in T_\ell} \|\Delta W_t\|_F$.
+For a comprehensive view, we aggregate the norms of all adapted components within a single Transformer block (e.g., `q_proj`, `k_proj`, `v_proj`, `o_proj` for attention) by summation: $$S_{\ell}^{\text{block}} = \sum_{t \in T_\ell} \|\Delta W_t\|_F$$.
 
-### A Two-Stage Experimental Design
+### Experimental Design
 
 Our investigation followed a two-stage process to first map and then validate the locus of adaptation.
 
-#### Stage 1: Comprehensive Adaptational Mapping
+#### Comprehensive Adaptational Mapping
 
 In the first stage, we conducted a broad, component-wise analysis for each domain. We applied LoRA adapters under three distinct regimes to understand the division of labor:
 
@@ -49,17 +45,17 @@ In the first stage, we conducted a broad, component-wise analysis for each domai
 * **MLP-Only**: Adapters were applied exclusively to the MLP projection matrices (`gate_proj`, `up_proj`, `down_proj`) in every layer.
 * **Full Model (All)**: Adapters were applied to all attention and MLP components simultaneously, serving as a baseline for full-model adaptation.
 
-#### Stage 2: Targeted Validation
+#### Targeted Validation
 
-The adaptational map generated in Stage 1 was then validated. We analyzed the $S_\ell$ values from the full-model runs to identify the layers that underwent the most significant changes. Based on this ranking, we designed a new set of targeted fine-tuning configurations, including "Soloist Tuning" (adapting only the single top-ranked layer) and "Ensemble Tuning" (adapting the top-3 layers).
+The adaptational map generated in Stage 1 was then validated. We analyzed the $$S_\ell$$ values from the full-model runs to identify the layers that underwent the most significant changes. Based on this ranking, we designed a new set of targeted fine-tuning configurations, including "Soloist Tuning" (adapting only the single top-ranked layer) and "Ensemble Tuning" (adapting the top-3 layers).
 
 ---
 
-## 📊 Results and Discussion
+## Results and Discussion
 
 ### Adaptational Analysis Points to MLP Layers
 
-Our initial adaptational mapping revealed a clear and consistent pattern across all models and domains: **the optimizer dedicates the vast majority of its updates to the MLP layers.** As shown in the figures below, the magnitude of weight change in MLP-only fine-tuning is substantially higher than in attention-only fine-tuning and closely tracks the MLP changes observed in full-model tuning. This provides strong evidence that MLP layers are the primary locus where new, domain-specific computation is written and stored.
+Our initial adaptational mapping shows a clear trend  across all models and domains: **the optimizer dedicates the vast majority of its updates to the MLP layers.** As shown in the figures below, the magnitude of weight change in MLP-only fine-tuning is substantially higher than in attention-only fine-tuning and closely tracks the MLP changes observed in full-model tuning. This provides strong evidence that MLP layers are the primary locus where new, domain-specific computation is written and stored.
 
 #### Llama 3.2 3B - Layer-wise Weight Changes
 
@@ -105,7 +101,7 @@ Our initial adaptational mapping revealed a clear and consistent pattern across 
 
 If the layers with the largest parameter deltas are indeed the most important, then fine-tuning only these layers should yield a parameter-efficient performance gain. We tested this by fine-tuning only the top-1 and top-3 layers identified by our analysis and evaluating their performance on domain-specific perplexity tasks (normalized between 0 and 1).
 
-The results confirm our hypothesis. As shown below for Llama 3.2 3B, targeted fine-tuning of just a few layers often achieves performance comparable to—and sometimes exceeding—that of fine-tuning the entire model, despite using a fraction of the parameters. This demonstrates that our adaptational map is not merely descriptive but predictive.
+The results confirm our hypothesis. As shown below for Llama 3.2 3B, targeted fine-tuning of just a few layers often achieves performance comparable to that of fine-tuning the entire model, despite using a fraction of the parameters. This demonstrates that our adaptational map is not merely descriptive but predictive.
 
 | Domain  | PT   | MLP  | Attn | Both | Top-1 MLP | Top-1 Attn | Top-3 MLP | Top-3 Attn |
 | :------ | :--- | :--- | :--- | :--- | :-------- | :--------- | :-------- | :--------- |
