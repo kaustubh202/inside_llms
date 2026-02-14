@@ -56,7 +56,7 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 
 
 *Figure — The bilinear one has a diagonal band, ReLU is mostly white with a few bright spots (marked in red), and SwiGLU lies somewhere in between.*
-> Here are the entropy numbers: ground truth is 4.57, bilinear gets 4.33, SwiGLU gets 2.87, and ReLU gets 0.37.
+> Here are the entropy numbers: ground truth is $$4.57$$, bilinear gets $$4.33$$, SwiGLU gets $$2.87$$, and ReLU gets $$0.37$$.
 
 **For modular multiplication:** For multiplication, we analyzed the effective rank of the interaction matrices using Singular Value Decomposition (SVD).
 
@@ -117,19 +117,19 @@ The only difference is the nonlinearity. We used standard Adam training with one
 
 The ground truth operator for addition mod p is circulant; it's diagonal in the Fourier basis. So we took the $2D$ Fourier transform of each $$M_k$$ and looked at where the energy concentrates.
 
-The bilinear spectra look almost exactly like the ground truth. There's this clean diagonal band in the (u,v) frequency plane. When we compute the entropy of the power spectrum, we get 4.33 on average across classes. Ground truth is $4.57$. They're nearly matching the ideal structure.
+The bilinear spectra look almost exactly like the ground truth. There's this clean diagonal band in the (u,v) frequency plane. When we compute the entropy of the power spectrum, we get 4.33 on average across classes. Ground truth is $$4.57$$. They're nearly matching the ideal structure.
 
-SwiGLU shows an intermediate structure. You can see traces of the diagonal pattern in its Fourier spectrum, with entropy $2.87$, more structured than ReLU but less clean than bilinear.
+SwiGLU shows an intermediate structure. You can see traces of the diagonal pattern in its Fourier spectrum, with entropy $$2.87$$, more structured than ReLU but less clean than bilinear.
 
 The ReLU spectra are completely different. Energy is concentrated in a tiny number of frequencies, usually $5-7$ dominant peaks with everything else near zero. Average entropy: $0.37$. That's an order of magnitude lower. It's solving the task, but not by learning the circulant structure. [See Figure 1 and Figure 2]
 
 ### Modular Multiplication ($$\mathbb{Z}_{97}$$)
 
-Multiplication isn't circulant, so Fourier analysis doesn't help. Instead, we looked at singular values. We centered each Mₖ (subtracted row and column means) and computed the SVD.
+Multiplication isn't circulant, so Fourier analysis doesn't help. Instead, we looked at singular values. We centered each $$M_k$$(subtracted row and column means) and computed the SVD.
 
 The bilinear spectra drop off sharply. We examined the normalized spectrum, plotted on a log scale, for two representative classes (Figure 3). In the bilinear model, the spectra decay steeply: a small number of singular values account for most of the variance, and the tail drops rapidly. In the ReLU model, the spectra are noticeably flatter: the singular values decrease more slowly, and the tail remains substantial. Here, SwiGLU performs like ReLU, and is only slightly better.
 
-If you ask "how many singular vectors do we need to capture $90%$ of the energy," We summarize this quantitatively using the effective rank at two energy levels, $$\alpha=0.90$$ and $$\alpha=0.99$$. At $90%$ energy, the bilinear model has
+If you ask "how many singular vectors do we need to capture $$90%$$ of the energy," We summarize this quantitatively using the effective rank at two energy levels, $$\alpha=0.90$$ and $$\alpha=0.99$$. At $90%$ energy, the bilinear model has
 
 While the ReLU model requires roughly twice as many singular directions:
 
@@ -141,11 +141,11 @@ For the graph task, we trained both models on the one-step relation $$R_1(h) = (
 
 Then we extracted a transition matrix $T$ where $$T[t,h] = \text{probability of tail } t \text{ given head } h.$$
 
-The bilinear model's $T$ has very sharp columns. Each column is nearly one-hot, with almost all probability mass on a single tail. Column entropy averages 0.74 (a perfect permutation would be 0, a uniform distribution would be ~6). The ReLU model's columns are diffuse, entropy $4.89$, and almost uniform. SwiGLU's $T$ has more focused columns than ReLU, but not as sharp as bilinear. Column entropy averages 1.09; you can see a peak in each column, but with more spread than bilinear's near one-hot structure.
+The bilinear model's $T$ has very sharp columns. Each column is nearly one-hot, with almost all probability mass on a single tail. Column entropy averages 0.74 (a perfect permutation would be 0, a uniform distribution would be ~6). The ReLU model's columns are diffuse, entropy $4.89$, and almost uniform. SwiGLU's $$T$$ has more focused columns than ReLU, but not as sharp as bilinear. Column entropy averages 1.09; you can see a peak in each column, but with more spread than bilinear's near one-hot structure.
 
-But the composition behavior is what really got me. We kept multiplying $T$ by itself to get $$T^k$$, then for each head, we compared the predicted tail to the true $k$-step successor $$(h+k) \bmod N.$$
+But the composition behavior is what really got me. We kept multiplying $$T$$ by itself to get $$T^k$$, then for each head, we compared the predicted tail to the true $k$-step successor $$(h+k) \bmod N.$$
 
-For bilinear: accuracy stays exactly 1.0 through $$k=80$$. Then it starts degrading, above 0.95 until $$k\approx 90$$, above 0.80 until $$k\approx 100$$, and crosses 0.5 around $$k\approx 110$$. It's tracking the true $$k$$-step successor for a surprisingly long time.
+For bilinear: accuracy stays exactly 1.0 through $k=80$. Then it starts degrading, above 0.95 until $$k \approx 90$$, above 0.80 until $$k\approx 100$$, and crosses 0.5 around $$k\approx 110$$. It's tracking the true $k$-step successor for a surprisingly long time.
 
 For SwiGLU: accuracy stays high through $$k\approx 50$$, then degrades more quickly than bilinear but more gracefully than ReLU, crossing 0.5 around $$k\approx 80$$.
 
@@ -158,7 +158,7 @@ At $$k > 120$$, all the models had lost their capability to predict the true val
 
 The bilinear architecture forces every interaction between input features to go through an explicit tensor $$T_{ijk} = (W_1)_{ik}(W_2)_{jk}$$. This is a strong constraint. You can't create arbitrary combinations. In other words, everything has to factor nicely.
 
-SwiGLU sits in between. Its element-wise multiplication (gate $\odot$ value) provides some factorization constraint; each hidden unit comes from an explicit product of two learned projections. But the nonlinearity (SiLU activation) and the fact that both projections use the same input (unlike bilinear's separate $x$ and $y$) make them less clean.
+SwiGLU sits in between. Its element-wise multiplication (gate $$\odot$$ value) provides some factorization constraint; each hidden unit comes from an explicit product of two learned projections. But the nonlinearity (SiLU activation) and the fact that both projections use the same input (unlike bilinear's separate $$x$$ and $$y$$) make them less clean.
 
 ReLU has no such constraint. You can superimpose features, use polysemantic neurons, and spread computation across the hidden layer however you want. It's more flexible, which, for some tasks, might be necessary. But for these structured tasks, that flexibility leads to messier solutions.
 
