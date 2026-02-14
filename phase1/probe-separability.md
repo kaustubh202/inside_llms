@@ -127,12 +127,11 @@ Once we've captured the internal signals (activations), we need a way to "decode
 
 ### Our Metrics for Separability
 
+
 Due to the perfect accuracy probelm, we turned to more sensitive metrics like **Fisher Separability Score** and **Maximum Mean Discrepancy (MMD)**–they provide a deeper understanding of the quality and linear separability of the domain information within the model's internal representations.
 * **Fisher Separability Score:** This score measures how "spread out" the different domain clusters are in the activation space. A higher Fisher score indicates that the activations for different domains are far apart and tightly clustered, making them very easy for our linear probe to distinguish. The Fisher Separability Score for two classes, C_1 and C_2, with means and variances is defined as:
 
-  $$
-  F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}
-  $$
+  $$F = \frac{(\mu_1 - \mu_2)^2}{\sigma_1^2 + \sigma_2^2}$$
 
   In a multi-dimensional feature space, this extends to the ratio of between-class variance to within-class variance.
 
@@ -149,9 +148,9 @@ Due to the perfect accuracy probelm, we turned to more sensitive metrics like **
     $$
 
     where:
-- \( k(\cdot, \cdot) \) is a positive-definite kernel (e.g., Gaussian RBF),
-- \( x, x' \sim P \),
-- \( y, y' \sim Q \). A larger MMD value means the two distributions are more dissimilar. When using a characteristic kernel (such as Gaussian RBF), MMD equals zero when the two distributions are identical. Unlike trivial mean comparisons, MMD captures differences in means, variances, and higher-order structure depending on the chosen kernel.
+- $$k(\cdot, \cdot)$$ is a positive-definite kernel (e.g., Gaussian RBF),
+- $$x, x' \sim P$$,
+- $$y, y' \sim Q$$. A larger MMD value means the two distributions are more dissimilar. When using a characteristic kernel (such as Gaussian RBF), MMD equals zero when the two distributions are identical. Unlike trivial mean comparisons, MMD captures differences in means, variances, and higher-order structure depending on the chosen kernel.
 
 These distributional metrics helped us overcome the dead-end provided by Logistic Regression. We found that Fisher and MMD scores did not saturate, and hence produced nearly overlapping results after normalization. This synchronization confirms that the trends we observe are not a fluke, and they genuinely do reveal structural features of the residual stream.
 
