@@ -27,38 +27,29 @@ We define the following logit vectors:
 
 - **Baseline Vector $$(B)$$:** The model's intrinsic logits.
     
-    \begin{equation*}
-    \begin{split}
+    $$
     {B} = \begin{bmatrix} z(t_c) \\z(t_i) \end{bmatrix}
-    \end{split}
-    \end{equation*}
+    $$
     
 - **Prior Vector $$(P)$$:** The target prior distribution provided in the prompt.
 
-\begin{equation*}
-\begin{split}
-{P} = \begin{bmatrix} z(t_i) \\ z(t_c) \end{bmatrix}
-\end{split}
-\end{equation*}
+    $$
+    {P} = \begin{bmatrix} z(t_i) \\ z(t_c) \end{bmatrix}
+    $$
 
 - **Resultant Vector $$(R)$$:** The logits observed after prompting with the prior.
     
-    \begin{equation*}
-    \begin{split}
+    $$
     {R} = \begin{bmatrix} z'(t_c) \\ z'(t_i) \end{bmatrix}
-    \end{split}
-    \end{equation*}
-    
+    $$
 
 **Steering Coefficient$$(\alpha)$$:**
 
 We measure the steering effect using the scalar projection of the observed shift $$({R} - {B})$$ onto the intended shift direction $$({P} - {B})$$:
 
-\begin{equation*}
-\begin{split}
+$$
 \alpha = \frac{({R} - {B}) \cdot ({P} - {B})}{\|{P} - {B}\|^2}
-\end{split}
-\end{equation*}
+$$
 
 **Interpretation of $$\alpha$$:**
 
@@ -68,7 +59,7 @@ We measure the steering effect using the scalar projection of the observed shift
 
 **Experimental Setup**
 
-We conducted this study using Llama 3.1 8B-instruct. Our dataset consisted of ~100 distinct prompts , each consisting of a simple factual base prompt (e.g.,`The capital of France is ` ). For each prompt, we identified a target pair consisting of one factually correct token (e.g., `Paris`) and one high-probability counter-factual token (e.g., `London` or `Berlin`) to serve as our steering targets.
+We conducted this study using `Llama 3.1 8B-instruct`. Our dataset consisted of ~100 distinct prompts , each consisting of a simple factual base prompt (e.g.,`The capital of France is ` ). For each prompt, we identified a target pair consisting of one factually correct token (e.g., `Paris`) and one high-probability counter-factual token (e.g., `London` or `Berlin`) to serve as our steering targets.
 
 ## Results
 ![Distribution of $$\alpha$$ across dataset](alpha_distribution.png)
