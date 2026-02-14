@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Inside LLMs](README.md)
-* [Domain Discovery Experiments](phase1/README.md)
+* [Dissecting Attention vs. MLP Roles](phase1/README.md)
   * [Fine Tuning](phase1/fine_tune.md)
   * [Probe Separability](phase1/probe-separability.md)
   * [Hydra Effect](phase1/hydra-effect.md)
