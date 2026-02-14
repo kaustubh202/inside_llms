@@ -2,13 +2,8 @@
 
 ##  Objective
 
-This project investigates a fundamental question in the study of Large Language Models: **How does a single, monolithic network pivot its internal mechanisms to handle diverse and specialized domains like programming, medicine, and finance?**
+This experiment focuses on the **Adaptational Analysis**, which aims to identify and quantify which parameters change the most when the model is fine-tuned on a new domain, thereby revealing the primary locus of learning. 
 
-Our goal is to move beyond correlational analysis and build a causal, layer-level map of a model's functional architecture. We achieve this by introducing the **Layer-Domain Control (LDC)** framework, a unified methodology that synthesizes evidence from representational analysis, adaptational analysis, and causal intervention.
-
-This document focuses on the **Adaptational Analysis**, which aims to identify and quantify which parameters change the most when the model is fine-tuned on a new domain, thereby revealing the primary locus of learning.
-
----
 
 ##  Fine-Tuning Methodology
 
