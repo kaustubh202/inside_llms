@@ -1,7 +1,6 @@
 # Table of contents
 
 -   [Inside LLMs](README.md)
--   [Formal Objective](formal-objectives.md)
 -   [Domain Discovery Experiments](phase1/README.md)
     -   [Forward Pass Profiling](phase1/forward_pass.md)
     -   [Fine Tuning](phase1/fine_tune.md)
