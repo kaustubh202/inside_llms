@@ -1,7 +1,7 @@
 # Causal Intervention
 
 Causal intervention is based on the concept of activation swapping. Activation swapping is the process of running two inferences on an LLM, exchanging outputs of a layer and then observing the effects. The effect that we want to observe is the shift in distribution of output from one domain's tokens to anothers when we run an LLM on a **Domain Classification** task.
-The core of the experiment asks, if we transplant the hidden state from a donor prompt in domain $D_b$ into a recipient prompt in $D_a$, does the model's next-token distribution shifts toward $D_b$? We use metrics such as _KL Divergence_ and _Delta Bias_ to quantify our notion of distribution shift.
+The core of the experiment asks, if we transplant the hidden state from a donor prompt in domain $$D_b$$ into a recipient prompt in $$D_a$$, does the model's next-token distribution shifts toward $$D_b$$? We use metrics such as _KL Divergence_ and _Delta Bias_ to quantify our notion of distribution shift.
 
 ## Task Description
 
@@ -16,7 +16,7 @@ Below are two sets of keywords that you need to classify into two domains.
 which set is domain X? Answer: Option (
 ```
 
-From this template, we define the recipient input $x_a$ as the "factual" prompt where the queried domain X corresponds to list (A). Conversely, the donor input $x_b$ is the "counterfactual" prompt where the queried domain X corresponds to list (B). Ideally, the model should predict "A" for $x_a$. Our goal is to determine if injecting activations from $x_b$ steers the model to predict "B".
+From this template, we define the recipient input $$x_a$$ as the "factual" prompt where the queried domain X corresponds to list (A). Conversely, the donor input $$x_b$$ is the "counterfactual" prompt where the queried domain X corresponds to list (B). Ideally, the model should predict "A" for $$x_a$$. Our goal is to determine if injecting activations from $$x_b$$ steers the model to predict "B".
 
 > Why did we choose this exact structure?
 
@@ -27,7 +27,7 @@ If the model is asked to answer in either _A_ or _B_, we removed noise related t
 
 > How are representational tokens created?
 
-There are multiple ways which we explored to generate the representative token list for a specific domain. We create a pool of tokens which represents a whole domain and for each prompt pair, sample $n$ tokens from this pool randomly.Here are some of the methods that we tried:
+There are multiple ways which we explored to generate the representative token list for a specific domain. We create a pool of tokens which represents a whole domain and for each prompt pair, sample $$n$$ tokens from this pool randomly.Here are some of the methods that we tried:
 
 - **Frequency Analysis**: We take a corpus of documents and texts corresponding to a specific domain. For example, for Science we use corpuses of High-School and College level problem-solution pairs and for Law we use corpuses of US law records. In a corpus, we simply count the frequency of how many times a word occurs and rank them. We remove stop-words such as "the", "he", "she" and take the top 300-400 tokens.
 - **Domain Injection**: This novel technique distills the relational information from a different or larger model. We take a neutral prompt and inject a prompt containing information about a domain. We inject this information at different layers and see which tokens rise up in the probability the most. This is done over multiple layers and different models and the results are averaged out. Obvious tokens such as "Science" "scientific study" are removed by hand.
@@ -42,17 +42,17 @@ Domain Prompt: List some representative tokens on Science.
 
 ## Methodology
 
-We focus our analysis on multiple domain pairs (e.g. C++/Python, Medicine/Finance) to ensure generalizability. For a chosen layer $l$ and the final prompt position $t*$, we:
+We focus our analysis on multiple domain pairs (e.g. C++/Python, Medicine/Finance) to ensure generalizability. For a chosen layer $$l$$ and the final prompt position $$t*$$, we:
 
-1. run a forward pass on the donor (conflicting) input $x_b$ and save the donor activations $a_l^{donor}(t*)$.
-2. run a forward pass on the recipient (correct) input $x_a$ but, at layer $l$ and position $t*$, replace the recipient activation with $a_l^{donor}(t*)$ and continue inference to obtain the patched distribution $p\_{swap(l)}(. | x_a).
+1. run a forward pass on the donor (conflicting) input $$x_b$$ and save the donor activations $$a_l^{donor}(t*)$$.
+2. run a forward pass on the recipient (correct) input $$x_a$$ but, at layer $$l$$ and position $$t*$$, replace the recipient activation with $$a_l^{donor}(t*)$$ and continue inference to obtain the patched distribution $$p\_{swap(l)}(. | x_a)$$.
 3. repeat across many donor-recipient pairs and compute metrics.
 
 ## Metrics
 
 #### KL Divergence
 
-For a donor input input $x_b$ and recipient input $x_a$ we define
+For a donor input input $$x_b$$ and recipient input $$x_a$$ we define
 
 $$
 \begin{equation*}
@@ -60,7 +60,7 @@ $$
 \end{equation*}
 $$
 
-where $p(. | x_a)$ is the original next-token distribution and $p_{swap_l}(. | x_a)$ is the patched distribution. The KL divergence measures how strongly the swap perturbs the model's predictive distribution at the intervention point.
+where $$p(. | x_a)$$ is the original next-token distribution and $$p_{swap_l}(. | x_a)$$ is the patched distribution. The KL divergence measures how strongly the swap perturbs the model's predictive distribution at the intervention point.
 
 #### Delta Bias
 
@@ -92,7 +92,7 @@ $$
 $$
 \Delta \mathrm{Bias}(A \xleftarrow{\;\ell\;} B) = \mathbb{E}_{x_A \sim A,\; x_B \sim B} \left[ \mathrm{Bias}_{\mathrm{swap}}\!\left(x_A \xleftarrow{\;\ell\;} x_B\right) - \mathrm{Bias}_{\mathrm{base}}(x_A) \right]
 $$
-In our results, we use the convention that when $A \xleftarrow{\;\ell\;} B$ is performed, we plot bias with a positive sign, and when we perform the intervention $B \xleftarrow{\;\ell\;} A$, we plot bias with a negative sign to preserve perspective with respect to the set of characteristic tokens $B$. Thus, all bias computations are visualized as the shift in preference of $B$ over $A$.
+In our results, we use the convention that when $$A \xleftarrow{\;\ell\;} B$$ is performed, we plot bias with a positive sign, and when we perform the intervention $$B \xleftarrow{\;\ell\;} A$$, we plot bias with a negative sign to preserve perspective with respect to the set of characteristic tokens $$B$$. Thus, all bias computations are visualized as the shift in preference of $$B$$ over $$A$$.
 
 ## Results
 We show the results for our experiments on Llama 3b model. Similar results have been observed in other architecutures which we have discussed in the main paper.
