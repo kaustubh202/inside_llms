@@ -113,3 +113,14 @@ When we sort the layers based on their fisher seperability, we observe that laye
 ![alt text](llama-3b-kl-mlp.png)
 
 Analysis of layers in Llama-3B, comparing KL divergence (left) and a Delta Bias (right) between C++ and Python inputs. The layers on left section ar e layers with highest Fisher score and right section have lowest Fisher score. Top-ranked layers show substantially higher KL divergence and Delta Bias, reflecting higher influence on final output.
+
+#### Representative Tokens 
+We observe that by prompting the LLM directly for its representative token list results in less variation and sharper transitions in probabilities. 
+
+![alt text](image.png)
+
+Results obtained using representative tokens with Frequency analysis contain higher variation and weaker transitions. 
+
+![alt text](image-1.png)
+
+Results obtained using representative tokens obtained by prompting the LLM. 
