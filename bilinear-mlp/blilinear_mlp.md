@@ -21,11 +21,24 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 * **SwiGLU:** Maintained perfect accuracy up to $k \approx 50$ steps, then dropped slowly.
 * **ReLU:** Collapsed immediately ($$k$$<5). wets matrix was diffuse and "messy" (Entropy $4.89$)
 
-![Multi-step composition R^k plot](images/comp.png)
-*Figure — Multi-step composition behaviour of the learned transition operator $T$ (taken by taking the softmax of the logits over the vocabulary). The plot shows $k$-step accuracy Acc($k$) of $$T^k$$ compared to the true $k$-step successor on the cycle.*
+<!-- put the file at docs/images/multi-step.png -->
+<figure>
+  <img src="images/comp.png"
+  style="max-width:100%; height:auto;" />
+  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
+    Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.
+  </figcaption>
+</figure>
 
-![Column Entropy](images/entropy.png)
-*Figure — Distribution of column entropies $H(h)$ for the learned transition operator $T$ on the cycle graph.*
+<!-- put the file at docs/images/multi-step.png -->
+<figure>
+  <img src="./images/entropy.png" 
+  style="max-width:100%; height:auto;" />
+  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
+    Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.
+  </figcaption>
+</figure>
+
 
 **For modular addition:** The ground truth for modular addition is diagonal in the Fourier basis.
 
