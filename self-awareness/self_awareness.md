@@ -62,7 +62,7 @@ $$
 We conducted this study using `Llama 3.1 8B-instruct`. Our dataset consisted of ~100 distinct prompts , each consisting of a simple factual base prompt (e.g.,`The capital of France is ` ). For each prompt, we identified a target pair consisting of one factually correct token (e.g., `Paris`) and one high-probability counter-factual token (e.g., `London` or `Berlin`) to serve as our steering targets.
 
 ## Results
-![Distribution of steering coefficient across dataset](alpha_distribution.png)
+![Distribution of steering coefficient across dataset](alpha_distribution_final.png)
 
 Based on the above results, we observe a consistent positive shift in the steering coefficient ($$\alpha$$), with the vast majority of samples falling above zero. This indicates that the model actively integrated the injected prior logits, shifting its internal probability distribution away from its factual knowledge and toward the counter-factual targets. This confirms that generation is steerable with externally injected priors, effectively overriding the model's pre-trained parametric knowledge.
 
