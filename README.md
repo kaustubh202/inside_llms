@@ -4,7 +4,7 @@ icon: hand-wave
 
 # Inside LLMs
 
-We’re a small group of undergrads from the Data Science Group at IIT Roorkee who got unusually curious about one question:
+We’re a small group of undergrads from the [Data Science Group](https://dsgiitr.in/) at IIT Roorkee who got unusually curious about one question:
 
 **What’s actually going on inside neural networks?**
 
@@ -19,7 +19,7 @@ This space became our rabbit hole.
 A lot of ML research focuses on _what models can do_.\
 Mechanistic interpretability asks something different:
 
-> **How are they doing it?**
+> **How are they learning it?**
 
 That question pulled us into probing attention layers, dissecting MLPs, testing causal interventions, studying fine-tuning shifts, and even poking at ideas like self-modeling, model introspection, and more interpretable foundational architectures.
 
