@@ -69,42 +69,42 @@ Our initial adaptational mapping revealed a clear and consistent pattern across 
 #### Llama 3.2 3B - Layer-wise Weight Changes
 
 | C++                                                                                                                      | Python                                                                                                                        |
-| :----------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| ![Llama 3B C++](inside_llms/phase1/fine_tune_new/full_new/llama_3b/fig_norm_llama_3b_cpp.png)                                  | ![Llama 3B Python](inside_llms/phase1/fine_tune_new/full_new/llama_3b/fig_norm_llama_3b_python.png)                                |
+| :----------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- | 
+| ![Llama 3B C++](fine_tune_new/full_png/llama_3b/fig_norm_llama_3b_cpp.png)                                  | ![Llama 3B Python](fine_tune_new/full_png/llama_3b/fig_norm_llama_3b_python.png)                                |
 | **Math** | **Medical** |
-| ![Llama 3B Math](inside_llms/phase1/fine_tune_new/full_new/llama_3b/fig_norm_llama_3b_math.png)                                | ![Llama 3B Medical](inside_llms/phase1/fine_tune_new/full_new/llama_3b/fig_norm_llama_3b_medical.png)                              |
+| ![Llama 3B Math](fine_tune_new/full_png/llama_3b/fig_norm_llama_3b_math.png)                                | ![Llama 3B Medical](fine_tune_new/full_png/llama_3b/fig_norm_llama_3b_medical.png)                              |
 | **Science** | **Finance** |
-| ![Llama 3B Science](inside_llms/phase1/fine_tune_new/full_new/llama_3b/fig_norm_llama_3b_science.png)                          | ![Llama 3B Finance](inside_llms/phase1/fine_tune_new/full_new/llama_3b/fig_norm_llama_3b_finance.png)                              |
+| ![Llama 3B Science](fine_tune_new/full_png/llama_3b/fig_norm_llama_3b_science.png)                          | ![Llama 3B Finance](fine_tune_new/full_png/llama_3b/fig_norm_llama_3b_finance.png)                              |
 
 #### Llama 3.2 1B - Layer-wise Weight Changes
 
 | C++                                                                                                                      | Python                                                                                                                        |
 | :----------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| ![Llama 1B C++](inside_llms/phase1/fine_tune_new/full_new/llama_1b/fig_norm_llama_1b_cpp.png)                                  | ![Llama 1B Python](inside_llms/phase1/fine_tune_new/full_new/llama_1b/fig_norm_llama_1b_python.png)                                |
+| ![Llama 1B C++](fine_tune_new/full_png/llama_1b/fig_norm_llama_1b_cpp.png)                                  | ![Llama 1B Python](fine_tune_new/full_png/llama_1b/fig_norm_llama_1b_python.png)                                |
 | **Math** | **Medical** |
-| ![Llama 1B Math](inside_llms/phase1/fine_tune_new/full_new/llama_1b/fig_norm_llama_1b_math.png)                                | ![Llama 1B Medical](inside_llms/phase1/fine_tune_new/full_new/llama_1b/fig_norm_llama_1b_medical.png)                              |
+| ![Llama 1B Math](fine_tune_new/full_png/llama_1b/fig_norm_llama_1b_math.png)                                | ![Llama 1B Medical](fine_tune_new/full_png/llama_1b/fig_norm_llama_1b_medical.png)                              |
 | **Science** | **Finance** |
-| ![Llama 1B Science](inside_llms/phase1/fine_tune_new/full_new/llama_1b/fig_norm_llama_1b_science.png)                          | ![Llama 1B Finance](inside_llms/phase1/fine_tune_new/full_new/llama_1b/fig_norm_llama_1b_finance.png)                              |
+| ![Llama 1B Science](fine_tune_new/full_png/llama_1b/fig_norm_llama_1b_science.png)                          | ![Llama 1B Finance](fine_tune_new/full_png/llama_1b/fig_norm_llama_1b_finance.png)                              |
 
 #### Gemma 3 4B - Layer-wise Weight Changes
 
 | C++                                                                                                                      | Python                                                                                                                        |
 | :----------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| ![Gemma 4B C++](inside_llms/phase1/fine_tune_new/full_new/gemma_4b/fig_norm_gemma_4b_cpp.png)                                  | ![Gemma 4B Python](inside_llms/phase1/fine_tune_new/full_new/gemma_4b/fig_norm_gemma_4b_python.png)                                |
+| ![Gemma 4B C++](fine_tune_new/full_png/gemma_4b/fig_norm_gemma_4b_cpp.png)                                  | ![Gemma 4B Python](fine_tune_new/full_png/gemma_4b/fig_norm_gemma_4b_python.png)                                |
 | **Math** | **Medical** |
-| ![Gemma 4B Math](inside_llms/phase1/fine_tune_new/full_new/gemma_4b/fig_norm_gemma_4b_math.png)                                | ![Gemma 4B Medical](inside_llms/phase1/fine_tune_new/full_new/gemma_4b/fig_norm_gemma_4b_medical.png)                              |
+| ![Gemma 4B Math](fine_tune_new/full_png/gemma_4b/fig_norm_gemma_4b_math.png)                                | ![Gemma 4B Medical](fine_tune_new/full_png/gemma_4b/fig_norm_gemma_4b_medical.png)                              |
 | **Science** | **Finance** |
-| ![Gemma 4B Science](inside_llms/phase1/fine_tune_new/full_new/gemma_4b/fig_norm_gemma_4b_science.png)                          | ![Gemma 4B Finance](inside_llms/phase1/fine_tune_new/full_new/gemma_4b/fig_norm_gemma_4b_finance.png)                              |
+| ![Gemma 4B Science](fine_tune_new/full_png/gemma_4b/fig_norm_gemma_4b_science.png)                          | ![Gemma 4B Finance](fine_tune_new/full_png/gemma_4b/fig_norm_gemma_4b_finance.png)                              |
 
 #### Gemma 3 1B - Layer-wise Weight Changes
 
 | C++                                                                                                                      | Python                                                                                                                        |
 | :----------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
-| ![Gemma 1B C++](inside_llms/phase1/fine_tune_new/full_new/gemma_1b/fig_norm_gemma_1b_cpp.png)                                  | ![Gemma 1B Python](inside_llms/phase1/fine_tune_new/full_new/gemma_1b/fig_norm_gemma_1b_python.png)                                |
+| ![Gemma 1B C++](fine_tune_new/full_png/gemma_1b/fig_norm_gemma_1b_cpp.png)                                  | ![Gemma 1B Python](fine_tune_new/full_png/gemma_1b/fig_norm_gemma_1b_python.png)                                |
 | **Math** | **Medical** |
-| ![Gemma 1B Math](inside_llms/phase1/fine_tune_new/full_new/gemma_1b/fig_norm_gemma_1b_math.png)                                | ![Gemma 1B Medical](inside_llms/phase1/fine_tune_new/full_new/gemma_1b/fig_norm_gemma_1b_medical.png)                              |
+| ![Gemma 1B Math](fine_tune_new/full_png/gemma_1b/fig_norm_gemma_1b_math.png)                                | ![Gemma 1B Medical](fine_tune_new/full_png/gemma_1b/fig_norm_gemma_1b_medical.png)                              |
 | **Science** | **Finance** |
-| ![Gemma 1B Science](inside_llms/phase1/fine_tune_new/full_new/gemma_1b/fig_norm_gemma_1b_science.png)                          | ![Gemma 1B Finance](inside_llms/phase1/fine_tune_new/full_new/gemma_1b/fig_norm_gemma_1b_finance.png)                              |
+| ![Gemma 1B Science](fine_tune_new/full_png/gemma_1b/fig_norm_gemma_1b_science.png)                          | ![Gemma 1B Finance](fine_tune_new/full_png/gemma_1b/fig_norm_gemma_1b_finance.png)                              |
 
 ### Validating the Map with Targeted Fine-Tuning
 
