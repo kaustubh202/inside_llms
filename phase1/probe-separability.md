@@ -155,6 +155,67 @@ Due to the perfect accuracy probelm, we turned to more sensitive metrics like **
 These distributional metrics helped us overcome the dead-end provided by Logistic Regression. We found that Fisher and MMD scores did not saturate, and hence produced nearly overlapping results after normalization. This synchronization confirms that the trends we observe are not a fluke, and they genuinely do reveal structural features of the residual stream.
 
 ### Attention Hotspots vs. MLP Uniformity
+
+## Separability Scores Across Six Domains
+
+Each column displays **Attention (top)** and **MLP (bottom)** blocks for one domain.
+
+---
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+
+<div>
+<h4 align="center">C++</h4>
+<p align="center">
+<img src="iclr_graphs/attn_CPP.png" width="100%"><br>
+<img src="iclr_graphs/mlp_CPP.png" width="100%">
+</p>
+</div>
+
+<div>
+<h4 align="center">Python</h4>
+<p align="center">
+<img src="iclr_graphs/attn_Python.png" width="100%"><br>
+<img src="iclr_graphs/mlp_Python.png" width="100%">
+</p>
+</div>
+
+<div>
+<h4 align="center">Math</h4>
+<p align="center">
+<img src="iclr_graphs/attn_Math.png" width="100%"><br>
+<img src="iclr_graphs/mlp_Math.png" width="100%">
+</p>
+</div>
+
+<div>
+<h4 align="center">Medical</h4>
+<p align="center">
+<img src="iclr_graphs/attn_Medical.png" width="100%"><br>
+<img src="iclr_graphs/mlp_Medical.png" width="100%">
+</p>
+</div>
+
+<div>
+<h4 align="center">Science</h4>
+<p align="center">
+<img src="iclr_graphs/attn_Science.png" width="100%"><br>
+<img src="iclr_graphs/mlp_Science.png" width="100%">
+</p>
+</div>
+
+<div>
+<h4 align="center">Finance</h4>
+<p align="center">
+<img src="iclr_graphs/attn_Finance.png" width="100%"><br>
+<img src="iclr_graphs/mlp_Finance.png" width="100%">
+</p>
+</div>
+
+</div>
+
+
+
 Our most significant discovery from probe separability analysis is structural divergence between components, supported by both Fisher and MMD metrics:
 
 * Attention Layers: They show high variability across depth. Instead of a smooth line, we observe sharp peaks or "hotspots", particularly in the mid-to-deep layers. This indicates that specific attention layers possess highly disentangled, non-linear representations of domain identity. They act as routers steering domain identity.
