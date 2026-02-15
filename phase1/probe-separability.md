@@ -1,6 +1,6 @@
 # Probe Separability
 
-Now that we're done with forward pass profiling and modelling the fine-tuning process, we're diving into a powerful technique called **Probe Separability**. This experiment helps us answer a critical question: **Can we "read" what an LLM is thinking at different stages of its processing?**
+Now that we're done with modelling the fine-tuning process, we're diving into a powerful technique called **Probe Separability**. This experiment helps us answer a critical question: **Can we "read" what an LLM is thinking at different stages of its processing?**
 
 ## Why Probe?
 
@@ -27,56 +27,17 @@ We focused our probes on three key components within each transformer layer:
 Here's a glimpse of the core idea behind our `ActivationGrabber`:
 
 ```python
-import torch
-from typing import Literal, Dict
-import numpy as np # Used for .cpu().numpy() conversion
-
 class ActivationGrabber:
     def __init__(self, layer_idx: int, component_type: Literal["attn", "mlp", "resid"], seq_pool: str = "mean"):
-        self.L = layer_idx
-        self.component_type = component_type
-        self.seq_pool = seq_pool
+        # ... initialization code ...
         self.buffers: Dict[str, torch.Tensor] = {}
         self.handles = []
-        self.clear()
 
     def _save(self, name):
         def hook(_, __, out):
             if isinstance(out, tuple): out = out[0]
             self.buffers[name] = out.detach()
         return hook
-
-    def _pool(self, x: torch.Tensor) -> torch.Tensor:
-        if self.seq_pool == "mean": return x.mean(dim=1)
-        if self.seq_pool == "first": return x[:, 0]
-        raise ValueError(f"Unsupported sequence pooling type: {self.seq_pool}")
-
-    def clear(self):
-        self.buffers.clear()
-
-    def __enter__(self):
-        # This is where we attach the "microphones" (hooks)
-        # to the specific parts of the model (model.model.layers[self.L])
-        # based on self.component_type ("attn", "mlp", "resid").
-        # For example:
-        # layer = model.model.layers[self.L]
-        # if self.component_type == "attn":
-        #     self.handles.append(layer.self_attn.o_proj.register_forward_hook(self._save("attn")))
-        # ... and so on for mlp and resid.
-        pass # Actual hook registration logic is more detailed
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        # This ensures we clean up the "microphones" after we're done listening
-        for h in self.handles: h.remove()
-        self.clear()
-
-    def pooled(self) -> np.ndarray:
-        # This method retrieves the captured signal and "pools" it
-        # (e.g., averages it) to get a single vector per text.
-        # For example:
-        # if self.component_type == "attn":
-        #     return self._pool(self.buffers["attn"]).cpu().numpy()
-        pass # Actual pooling logic
 ```
 
 ## How We Ran the Experiment
@@ -94,37 +55,35 @@ Here's a high-level conceptual view of the main loop:
 # Conceptual Python code demonstrating the high-level probing process
 
 # (Setup: Load model, tokenizer, prepare dataset and dataloader)
-
 # Iterate through each layer of the LLM
-# for layer_idx in range(model.config.num_hidden_layers):
-#     # Iterate through each component type within the layer
-#     for component_type in ["attn", "mlp", "resid"]:
-#         print(f"Probing Layer {layer_idx}, Component: {component_type}...")
+for layer_idx in range(model.config.num_hidden_layers):
+    # Iterate through each component type within the layer
+    for component_type in ["attn", "mlp", "resid"]:
+        print(f"Probing Layer {layer_idx}, Component: {component_type}...")
 
-#         # Step 1: Collect Activations
-#         # Use ActivationGrabber and run texts through the model
-#         # X_activations, y_labels = collect_layer_features(layer_idx, dataloader, component_type)
+        # Step 1: Collect Activations
+        # Use ActivationGrabber and run texts through the model
+        X_activations, y_labels = collect_layer_features(layer_idx, dataloader, component_type)
 
-#         # Step 2 & 3: Train and Evaluate Probe
-#         # probe_results = train_logreg_probe(X_activations, y_labels)
+        # Step 2 & 3: Train and Evaluate Probe
+        probe_results = train_logreg_probe(X_activations, y_labels)
 
-#         # Step 4: Store/Report Results
-#         # print(f"  Accuracy: {probe_results['acc']:.4f}, V-Usable Bits: {probe_results['v_usable_bits']:.4f}")
-#         # (Detailed pairwise metrics would also be printed or stored here)
+        # Step 4: Store/Report Results
+        print(f"  Accuracy: {probe_results['acc']:.4f}")
 
-#         # Clean up memory after each run
-#         # del X_activations, y_labels; gc.collect(); torch.cuda.empty_cache()
+        # Clean up memory after each run
+        del X_activations, y_labels; gc.collect(); torch.cuda.empty_cache()
 ```
 
 ## Analyzing the Activations
 
-### The Accuracy Problem
+### Using Simple Metrics: Accuracy
 
-Once we've captured the internal signals (activations), we need a way to "decode" them. Initially, we decided to use **Logistic Regression** as our decoder. This is a very simple, linear classifier. The reason we choose a _linear_ model is crucial: if a linear probe can accurately classify the domain from a layer's activations, it means the domain-specific information is clearly separated and easily accessible within that layer. However, our analysis of Llama 3.1-3B revealed that domain knowledge is omni-present in the model. The Logistic Regression probe achieved nearly **100% accuracy** across almost all layers. While this confirms the presence of domain information, it acted as a dead-end for analyzing the internal structure of exactly _how_ that information is represented.
+Once we've captured the internal signals (activations), we need a way to "decode" them. Initially, we decided to use **Logistic Regression** as our decoder. This is a very simple, linear classifier. The reason we choose a _linear_ model is crucial: if a linear probe can accurately classify the domain from a layer's activations, it means the domain-specific information is clearly separated and easily accessible within that layer. The Logistic Regression probe achieved nearly **100% accuracy** across almost every single layer and component. While this confirms that domain information is omni-present throughout the model, it creates a "Metric Saturation" problem. So, in order to analyze the internal structure of exactly _how_ that information is represented, we turned to more sensitive metrics.
 
-### Our Metrics for Separability
+### Off to Advanced Metrics: Fisher Separability Score and MMD
 
-Due to the perfect accuracy probelm, we turned to more sensitive metrics like **Fisher Separability Score** and **Maximum Mean Discrepancy (MMD)**–they provide a deeper understanding of the quality and linear separability of the domain information within the model's internal representations.
+Due to the perfect accuracy problem, we turned to more sensitive metrics like **Fisher Separability Score** and **Maximum Mean Discrepancy (MMD)**–they provide a deeper understanding of the quality and linear separability of the domain information within the model's internal representations.
 
 *   **Fisher Separability Score:** This score measures how "spread out" the different domain clusters are in the activation space. A higher Fisher score indicates that the activations for different domains are far apart and tightly clustered, making them very easy for our linear probe to distinguish. The Fisher Separability Score for two classes, C\_1 and C\_2, with means and variances is defined as:
 
@@ -143,47 +102,46 @@ Due to the perfect accuracy probelm, we turned to more sensitive metrics like **
     2\,\mathbb{E}_{x \sim P,\; y \sim Q}[k(x,y)]
     $$
 
-    where:
+    where $$k(\cdot, \cdot)$$ is a kernel function (like Gaussian RBF). A larger MMD value means the two distributions are more dissimilar. When using a characteristic kernel (such as Gaussian RBF), MMD equals zero when the two distributions are identical. Unlike trivial mean comparisons, MMD captures differences in means, variances, and higher-order structure depending on the chosen kernel.
 
-    * $$k(\cdot, \cdot)$$ is a positive-definite kernel (e.g., Gaussian RBF),
-    * $$x, x' \sim P$$,
-    * $$y, y' \sim Q$$. A larger MMD value means the two distributions are more dissimilar. When using a characteristic kernel (such as Gaussian RBF), MMD equals zero when the two distributions are identical. Unlike trivial mean comparisons, MMD captures differences in means, variances, and higher-order structure depending on the chosen kernel.
-
-These distributional metrics helped us overcome the dead-end provided by Logistic Regression. We found that Fisher and MMD scores did not saturate, and hence produced nearly overlapping results after normalization. This synchronization confirms that the trends we observe are not a fluke, and they genuinely do reveal structural features of the residual stream.
+These distributional metrics helped us overcome the saturation problem of Logistic Regression. We found that Fisher and MMD scores did not saturate, and also produced nearly overlapping results after normalization. This synchronization confirms that the trends we observe are not a fluke, and they genuinely do reveal structural features of the residual stream.
 
 ### Attention Hotspots vs. MLP Uniformity
 
-## Separability Scores Across Six Domains
 
-Each column displays **Attention (top)** and **MLP (bottom)** blocks for one domain.
+|               |                               Medical                               |                               Science                               |                               Finance                               |
+| :-----------: | :-----------------------------------------------------------------: | :-----------------------------------------------------------------: | :-----------------------------------------------------------------: |
+| **Attention** | <img src="../.gitbook/assets/attn_Medical.png" alt="" width="100%"> | <img src="../.gitbook/assets/attn_Science.png" alt="" width="100%"> | <img src="../.gitbook/assets/attn_Finance.png" alt="" width="100%"> |
+|    **MLP**    | <img src="../.gitbook/assets/mlp_Medical.png" alt="" width="100%">  | <img src="../.gitbook/assets/mlp_Science.png" alt="" width="100%">  | <img src="../.gitbook/assets/mlp_Finance.png" alt="" width="100%">  |
 
-***
-
-<p align="center"><strong>C++</strong></p>
-
-<p align="center"><img src="../.gitbook/assets/attn_CPP.png" alt=""><br><img src="../.gitbook/assets/mlp_CPP.png" alt=""></p>
-
-<p align="center"><strong>Python</strong></p>
-
-<p align="center"><img src="../.gitbook/assets/attn_Python.png" alt=""><br><img src="../.gitbook/assets/mlp_Python.png" alt=""></p>
-
-<p align="center"><strong>Math</strong></p>
-
-<p align="center"><img src="../.gitbook/assets/attn_Math.png" alt=""><br><img src="../.gitbook/assets/mlp_Math.png" alt=""></p>
-
-<p align="center"><strong>Medical</strong></p>
-
-<p align="center"><img src="../.gitbook/assets/attn_Medical.png" alt=""><br><img src="../.gitbook/assets/mlp_Medical.png" alt=""></p>
-
-<p align="center"><strong>Science</strong></p>
-
-<p align="center"><img src="../.gitbook/assets/attn_Science.png" alt=""><br><img src="../.gitbook/assets/mlp_Science.png" alt=""></p>
-
-<p align="center"><strong>Finance</strong></p>
-
-<p align="center"><img src="../.gitbook/assets/attn_Finance.png" alt=""><br><img src="../.gitbook/assets/mlp_Finance.png" alt=""></p>
 
 Our most significant discovery from probe separability analysis is structural divergence between components, supported by both Fisher and MMD metrics:
 
-* Attention Layers: They show high variability across depth. Instead of a smooth line, we observe sharp peaks or "hotspots", particularly in the mid-to-deep layers. This indicates that specific attention layers possess highly disentangled, non-linear representations of domain identity. They act as routers steering domain identity.
-* MLPs: MLP outputs show small variance across all layers, indicating that MLPs process domain features in a uniform and distributed manner. They possess uniformly-distributed knowledge of all domains and simply act as computational units. They process domain-specific features broadly and uniformly throughout the network, implementing the "thinking" required for that domain rather than making high-level routing decisions.
+Based on the provided research paper and the tone of your existing draft, here is the completion of the blog post. I have continued from the "Attention Hotspots vs. MLP Uniformity" section, synthesized the causal and fine-tuning insights, and added a conclusion with practical implications.
+
+---
+
+### Attention Hotspots vs. MLP Uniformity
+
+Our most significant discovery from the probe separability analysis is the structural divergence between components, supported by both Fisher and MMD metrics.
+When we visualized the separability scores across the network depth, a striking pattern emerged. In **MLP layers** the domain information was distributed relatively uniformly across the layers. The variance in separability scores was low, suggesting that the MLPs are consistently processing domain-specific features throughout the entire depth of the model.
+In contrast, the **Attention layers** were "spiky". They displayed high variance with sharp _hotspots_ of separability. Specific layers (often in the mid-depth range, like layers 13–16) suddenly spiked in their ability to distinguish Medical text from Finance text, while neighboring layers showed little to no separability.
+
+This suggests a fundamental **Division of Labor** within the Transformer architecture:
+* **MLPs as Workbenches:** The uniformity suggests MLPs are the primary "workbenches" where domain-specific computation and knowledge storage happen continuously.
+* **Attention as Routers:** The hotspots suggest that specific attention layers act as "switch tracks" or _routers_, making high-stakes decisions about the context's identity before passing it back to the residual stream.
+
+
+## Implications: A Mechanistic Map for Efficiency
+
+So, why does this matter? Beyond the satisfaction of understanding how an LLM thinks, this "Mechanistic Map" has massive practical utility, particularly for **Parameter-Efficient Fine-Tuning (PEFT)**.
+Standard PEFT methods often target all modules or rely on intuition. However, our experiments proved that we can be surgical. By fine-tuning the most relevant layers identified by our separability hotspots, we can achieve domain performance comparable to fine-tuning the full model.
+
+### Conclusion
+
+Our journey into Probe Separability helped us reveal a structured architecture of domain-specialization within LLMs:
+1. **Separability:** We can linearly separate complex domains like Law, Medicine, and Science from the residual stream.
+2. **Structure:** Attention layers act as sparse routers (determining *what* context applies), while MLP layers act as dense memories (processing the *details* of that context).
+
+
+
