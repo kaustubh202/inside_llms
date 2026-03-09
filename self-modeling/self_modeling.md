@@ -1,4 +1,4 @@
-# Self Modelilng
+# Self Modelling
 
 ## Objective
 
