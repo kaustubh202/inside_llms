@@ -1,4 +1,4 @@
-# Do Bilinear MLPs Actually Learn Cleaner Circuits?
+# Bilinear MLP
 
 We've been reading about mechanistic interpretability for the past few months and came across a claim that bilinear MLPs are "interpretable by construction." When we read Pearce et al.'s paper, they demonstrated that bilinear layers can be decomposed into interaction tensors, allowing for direct analysis. That's interesting, but it left us thinking: do these models actually learn simpler internal representations than ReLU, or do they just learn the same stuff in a format that we can decompose?
 
@@ -21,77 +21,31 @@ To test this, we trained Bilinear, SwiGLU, and ReLU MLPs on identical algorithmi
 * **SwiGLU:** Maintained perfect accuracy up to $$k \approx 50$$ steps, then dropped slowly.
 * **ReLU:** Collapsed immediately ($$k$$<$$5$$). Its matrix was diffuse and "messy" (Entropy $$4.89$$)
 
-<!-- put the file at docs/images/multi-step.png -->
-<figure>
-  <img src="images/comp.png"
-  style="max-width:100%; height:auto;" />
-  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
-    Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.
-  </figcaption>
-</figure>
+<figure><img src="../.gitbook/assets/comp.png" alt=""><figcaption><p>Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.</p></figcaption></figure>
 
-<!-- put the file at docs/images/multi-step.png -->
-<figure>
-  <img src="./images/entropy.png" 
-  style="max-width:75%; height:auto;" />
-  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
-    Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.
-  </figcaption>
-</figure>
-
+<figure><img src="../.gitbook/assets/entropy.png" alt=""><figcaption><p>Multi-step composition behaviour of the learned transition operator T (taken by taking the softmax of the logits over the vocabulary). The plot shows k-step accuracy Acc(k) of T^k compared to the true k-step successor on the cycle.</p></figcaption></figure>
 
 **For modular addition:** The ground truth for modular addition is diagonal in the Fourier basis.
 
 * **Bilinear:** The extracted operator is almost identical to the textbook DFT. Fourier Entropy: $$4.33$$ (Ground Truth is $$4.57$$).
-
-
 * **ReLU:** Learned a sparse, spikey solution concentrating on 5-7 random frequencies. Fourier Entropy: $$0.37$$.
-
-
 * **SwiGLU:** Shows traces of the diagonal structure but retains some high-frequency noise. Fourier Entropy: $$2.87$$
 
-
-
-<!-- put the file at docs/images/fourier.png -->
-<figure>
-  <img src="./images/fourier.png" 
-  style="max-width:75%; height:auto;" />
-  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
-    Fourier analysis of the learned operators for modular addition. The plot shows the learned interaction matrices for each architecture. The bilinear model learns a diagonal matrix, the ReLU model learns a sparse matrix, and the SwiGLU model learns a matrix that is somewhere in between.
-  </figcaption>
-</figure>
-
-<figure>
-
-  <img src="images/spectral.png" 
-  style="max-width:75%; height:auto;" />
-  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
-    Here are the entropy numbers: ground truth is $$4.57$$, bilinear gets $$4.33$$, SwiGLU gets $$2.87$$, and ReLU gets $$0.37$$.
-  </figcaption>
-</figure>
+<figure><img src="../.gitbook/assets/spectral.png" alt=""><figcaption><p>Here are the entropy numbers: ground truth is $$4.57$$, bilinear gets $$4.33$$, SwiGLU gets $$2.87$$, and ReLU gets $$0.37$$.</p></figcaption></figure>
 
 **For modular multiplication:** For multiplication, we analyzed the effective rank of the interaction matrices using Singular Value Decomposition (SVD).
 
-* **Bilinear:** Learned a low-rank operator. The singular values dropped off steeply, needing only ~$$25$$ dimensions to capture $$90\%$$ of the energy.
+* **Bilinear:** Learned a low-rank operator. The singular values dropped off steeply, needing only \~$$25$$ dimensions to capture $$90\%$$ of the energy.
 * **ReLU:** Learned a high-rank operator, spreading computation diffusely across $$90$$+ dimensions.
 * **SwiGLU:** Interestingly, on this task, SwiGLU behaved like ReLU. It failed to find the low-rank structure and used a diffuse representation (slightly better than ReLU, though).
 
-
-
-<figure>
-  <img src="images/svd.png" 
-  style="max-width:100%; height:auto;" />
-  <figcaption style="text-align:center; font-size:0.95em; color:#555;">
-    Normalized singular value decay for centered interaction matrices Mₖ in modular multiplication, for two representative classes. (All K’s had the same graphs)
-  </figcaption>
-</figure>
+<figure><img src="../.gitbook/assets/svd.png" alt=""><figcaption><p>Normalized singular value decay for centered interaction matrices Mₖ in modular multiplication, for two representative classes. (All K’s had the same graphs)</p></figcaption></figure>
 
 ### Why We Think This Matters
 
-
 We realize these are toy tasks, and we understand real language models are doing vastly more complex things.
 
-But here's what struck me: these aren't hard tasks. All three architectures solve them perfectly (~100% accuracy). Yet they learn different internal mechanisms. And the gradient is visible: bilinear → SwiGLU → ReLU, from structured to messy. The only difference is the architecture. SwiGLU inherits some structure from bilinear’s multiplicative form, but it doesn’t fully match it.
+But here's what struck me: these aren't hard tasks. All three architectures solve them perfectly (\~100% accuracy). Yet they learn different internal mechanisms. And the gradient is visible: bilinear → SwiGLU → ReLU, from structured to messy. The only difference is the architecture. SwiGLU inherits some structure from bilinear’s multiplicative form, but it doesn’t fully match it.
 
 It makes me wonder: when we see messy, high-dimensional representations in real transformers, how much of that is because the task requires it, versus because the architecture permits it? The bilinear constraint, forcing interactions through explicit tensor factorization, seems to act like a regularizer toward structured solutions. SwiGLU's element-wise multiplication provides some constraint toward structured solutions, more than ReLU, though less than bilinear.
 
@@ -124,15 +78,11 @@ We wanted a fair comparison, so we matched everything we could think of:
 
 The only difference is the nonlinearity. We used standard Adam training with one random seed. Changing to different random seeds or sweeping hyperparameters still showed similar results (qualitatively).
 
-- **Bilinear** does $$h = (x W_1) \odot (y W_2),$$ where $$\odot$$ is element-wise multiplication.
-
-- **SwiGLU** does $$h = W_{\text{down}} \left[ (W_{\text{gate}} x) \odot \sigma(W_{\text{up}} x) \right],$$
-  where $$\sigma$$ is the SiLU activation function and  $$x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}.$$
-
-- **ReLU** does  $$h = \mathrm{ReLU}(W[x; y] + b).$$
+* **Bilinear** does $$h = (x W_1) \odot (y W_2),$$ where $$\odot$$ is element-wise multiplication.
+* **SwiGLU** does $$h = W_{\text{down}} \left[ (W_{\text{gate}} x) \odot \sigma(W_{\text{up}} x) \right],$$ where $$\sigma$$ is the SiLU activation function and $$x = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}.$$
+* **ReLU** does $$h = \mathrm{ReLU}(W[x; y] + b).$$
 
 > **Note:** Pearce et al. found that bilinear layers required dense Gaussian input noise to learn clean features on MNIST. We strictly avoided this. We used standard training with no noise. We wanted to see if the algebraic structure of the task itself was sufficient to enforce meaningful representations without regularization hacks.
-
 
 ### Modular Addition ($$\mathbb{Z}_{97}$$)
 
@@ -142,7 +92,7 @@ The bilinear spectra look almost exactly like the ground truth. There's this cle
 
 SwiGLU shows an intermediate structure. You can see traces of the diagonal pattern in its Fourier spectrum, with entropy $$2.87$$, more structured than ReLU but less clean than bilinear.
 
-The ReLU spectra are completely different. Energy is concentrated in a tiny number of frequencies, usually $$5-7$$ dominant peaks with everything else near zero. Average entropy: $$0.37$$. That's an order of magnitude lower. It's solving the task, but not by learning the circulant structure. [See Figure $$1$$ and Figure $$2$$]
+The ReLU spectra are completely different. Energy is concentrated in a tiny number of frequencies, usually $$5-7$$ dominant peaks with everything else near zero. Average entropy: $$0.37$$. That's an order of magnitude lower. It's solving the task, but not by learning the circulant structure. \[See Figure $$1$$ and Figure $$2$$]
 
 ### Modular Multiplication ($$\mathbb{Z}_{97}$$)
 
@@ -162,7 +112,7 @@ For the graph task, we trained both models on the one-step relation $$R_1(h) = (
 
 Then we extracted a transition matrix $$T$$ where $$T[t,h] = \text{probability of tail } t \text{ given head } h.$$
 
-The bilinear model's $$T$$ has very sharp columns. Each column is nearly one-hot, with almost all probability mass on a single tail. Column entropy averages $$0.74$$ (a perfect permutation would be $$0$$, a uniform distribution would be ~$$6$$). The ReLU model's columns are diffuse, entropy $$4.89$$, and almost uniform. SwiGLU's $$T$$ has more focused columns than ReLU, but not as sharp as bilinear. Column entropy averages $$1.09$$; you can see a peak in each column, but with more spread than bilinear's near one-hot structure.
+The bilinear model's $$T$$ has very sharp columns. Each column is nearly one-hot, with almost all probability mass on a single tail. Column entropy averages $$0.74$$ (a perfect permutation would be $$0$$, a uniform distribution would be \~$$6$$). The ReLU model's columns are diffuse, entropy $$4.89$$, and almost uniform. SwiGLU's $$T$$ has more focused columns than ReLU, but not as sharp as bilinear. Column entropy averages $$1.09$$; you can see a peak in each column, but with more spread than bilinear's near one-hot structure.
 
 But the composition behavior is what really got me. We kept multiplying $$T$$ by itself to get $$T^k$$, then for each head, we compared the predicted tail to the true $$k$$-step successor $$(h+k) \bmod N.$$
 
@@ -174,7 +124,6 @@ For ReLU: accuracy is $$1.0$$ at $$k=1$$ by construction, drops to $$0.895$$ at 
 
 At $$k > 120$$, all the models had lost their capability to predict the true value.
 
-
 ### Why This Happens (Our Theory)
 
 The bilinear architecture forces every interaction between input features to go through an explicit tensor $$T_{ijk} = (W_1)_{ik}(W_2)_{jk}$$. This is a strong constraint. You can't create arbitrary combinations. In other words, everything has to factor nicely.
@@ -185,9 +134,6 @@ ReLU has no such constraint. You can superimpose features, use polysemantic neur
 
 It's like the difference between being forced to write a function with clear variable names versus being allowed to use a single giant vector where everything is mixed. Both can compute the same function, but one is a lot easier to read, and also, interpretable!
 
-
 ### References
 
-> Pearce, M. T., Dooms, T., Rigg, A., Oramas, J. M., & Sharkey, L. (2025).
-> *Bilinear MLPs enable weight-based mechanistic interpretability*.
-> arXiv:2410.08417. https://arxiv.org/abs/2410.08417
+> Pearce, M. T., Dooms, T., Rigg, A., Oramas, J. M., & Sharkey, L. (2025). _Bilinear MLPs enable weight-based mechanistic interpretability_. arXiv:2410.08417. https://arxiv.org/abs/2410.08417
